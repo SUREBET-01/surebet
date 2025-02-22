@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sure Bet Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Sure Bet Calculator</h1>
+
+        <form>
+            <!-- Total Investment -->
+            <div class="mb-3">
+                <label for="totalStake" class="form-label">Total Investment (Stake)</label>
+                <input type="number" class="form-control" id="totalStake" value="120" step="0.01">
+            </div>
+
+            <!-- Bet Container -->
+            <div id="betContainer">
+                <div class="row g-3 bet-row mb-3 align-items-center">
+                    <div class="col-md-3">
+                        <label for="bettingHouse1" class="form-label">Casa de Apostas</label>
+                        <input type="text" class="form-control" id="bettingHouse1" value="Bet365">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="odd1" class="form-label">Odds</label>
+                        <input type="number" class="form-control auto-calc" id="odd1" value="2.00" step="0.01">
+                    </div>
+                    <div class="col-md-3">
+                        <div class="w-100">
+                            <label for="stake1" class="form-label">Stake</label>
+                            <input type="number" class="form-control" id="stake1" value="60.00" step="0.01">
+                        </div>
+                    </div>
+                    <div class="col-md-3" style="margin-bottom: -30px;">
+                        <div class="form-check ms-2">
+                            <input type="checkbox" class="form-check-input" id="lockStake1">
+                            <label class="form-check-label small" for="lockStake1">Fixar</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 bet-row mb-3 align-items-center">
+                    <div class="col-md-3">
+                        <label for="bettingHouse2" class="form-label">Casa de Apostas</label>
+                        <input type="text" class="form-control" id="bettingHouse2" value="Betano">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="odd2" class="form-label">Odds</label>
+                        <input type="number" class="form-control auto-calc" id="odd2" value="2.00" step="0.01">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="stake2" class="form-label">Stake</label>
+                        <input type="number" class="form-control" id="stake2" value="60.00" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <button type="button" class="btn btn-primary" onclick="addBet()">Adicionar Aposta</button>
+                <button type="button" class="btn btn-success" onclick="handleCalculation()">Calcular Surebet</button>
+                <button type="button" class="btn btn-warning" onclick="sendToGoogleSheets()">Salvar no Google Sheets</button>
+            </div>
+
+            <!-- Free Bet Checkbox -->
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="isFreeBet">
+                <label class="form-check-label" for="isFreeBet">Esta é uma Free Bet?</label>
+            </div>
+
+            <!-- Free Bet Fields (Hidden initially) -->
+            <div id="freeBetFields" class="border p-3 rounded" style="display: none;">
+                <div class="mb-3">
+                    <label for="freeBetExpiry" class="form-label">Data de Expiração</label>
+                    <input type="date" class="form-control" id="freeBetExpiry">
+                </div>
+                <div class="mb-3">
+                    <label for="freeBetReturn" class="form-label">Retorno Esperado</label>
+                    <input type="number" class="form-control" id="freeBetReturn" step="0.01">
+                </div>
+            </div>
+
+            <!-- Result Container -->
+            <div class="mt-4 p-3 border rounded bg-light" id="resultContainer"></div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
