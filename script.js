@@ -10,9 +10,9 @@ function addBet() {
     const betRow = document.createElement("div");
     betRow.classList.add("row", "g-3", "bet-row", "mb-3");
     betRow.innerHTML = `
-        <div class="col-md-4">
-            <label for="bettingHouse${betCount}" class="form-label">Casa de Apostas:</label>
-            <input type="text" class="form-control" id="bettingHouse${betCount}" value="Casa ${betCount}">
+        <div class="col-md-3">
+            <label for="bettingHouse${betCount}" class="form-label">Betting Houses:</label>
+            <input type="text" class="form-control" id="bettingHouse${betCount}" value="Betting House ${betCount}">
         </div>
         <div class="col-md-3">
             <label for="odd${betCount}" class="form-label">Odds:</label>
@@ -22,11 +22,25 @@ function addBet() {
             <label for="stake${betCount}" class="form-label">Stake:</label>
             <input type="number" class="form-control" id="stake${betCount}" value="0.00" step="0.01">
         </div>
+        ${betCount > 2 ? `
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger" onclick="deleteBet(this)" style="margin-top: 30px">
+                <i class="fas fa-trash"></i> 
+            </button>        
+        </div>` : ""}
     `;
     document.getElementById("betContainer").appendChild(betRow);
     addInputListeners();
+    handleCalculation();
 }
 
+function deleteBet(id) {
+    betManager.removeBet(id);
+    const betRow = document.querySelector(`.bet-row[data-id='${id}']`);
+    if (betRow) {
+        betRow.remove();
+    }
+}
 
 function addInputListeners() {
     document.querySelectorAll("#totalStake, .auto-calc, #lockStake1").forEach(input => {
@@ -37,8 +51,20 @@ function addInputListeners() {
 
 function handleCalculation() {
     document.getElementById("lockStake1").checked ? calculateBasedOnFixedStake() : calculateBasedOnTotalStake();
+    toggleStakeFields();
 }
 
+function toggleStakeFields() {
+    const isFixedStake = document.getElementById("lockStake1").checked;
+    for (let i = 2; i <= betCount; i++) {
+        const stakeInput = document.getElementById(`stake${i}`);
+        if (isFixedStake) {
+            stakeInput.disabled = true; 
+        } else {
+            stakeInput.disabled = false; 
+        }
+    }
+}
 
 function calculateBasedOnTotalStake() {
     let totalStake = parseFloat(document.getElementById("totalStake").value);
@@ -66,11 +92,11 @@ function calculateBasedOnTotalStake() {
         returns.push(stake * odd);
 
         resultsHTML += `
-            <div class="result-row">
-                <div><strong>Casa:</strong> ${bettingHouse}</div>
-                <div><strong>Stake:</strong> ${stake.toFixed(2)}</div>
-                <div><strong>Net Return:</strong> ${(stake * odd).toFixed(2)}</div>
-            </div>
+       <div class="row mb-2">
+            <div class="col-4"><strong>Betting House:</strong> ${bettingHouse}</div>
+            <div class="col-4"><strong>Stake:</strong> ${stake.toFixed(2)}</div>
+            <div class="col-4"><strong>Net Return:</strong> ${(stake * odd).toFixed(2)}</div>
+        </div>
         `;
     }
 
@@ -91,10 +117,10 @@ function calculateBasedOnFixedStake() {
     let totalStake = stake1;
 
     resultsHTML += `
-        <div class="result-row">
-            <div><strong>Casa:</strong> ${bettingHouse1}</div>
-            <div><strong>Stake:</strong> ${stake1.toFixed(2)}</div>
-            <div><strong>Net Return:</strong> ${(stake1 * odd1).toFixed(2)}</div>
+        <div class="row mb-2">
+            <div class="col-4"><strong>Betting House 2:</strong> ${bettingHouse1}</div>
+            <div class="col-4"><strong>Stake:</strong> ${stake1.toFixed(2)}</div>
+            <div class="col-4"><strong>Net Return:</strong> ${(stake1 * odd1).toFixed(2)}</div>
         </div>
     `;
 
@@ -111,10 +137,10 @@ function calculateBasedOnFixedStake() {
         returns.push(stake * odd);
 
         resultsHTML += `
-            <div class="result-row">
-                <div><strong>Casa:</strong> ${bettingHouse}</div>
-                <div><strong>Stake:</strong> ${stake.toFixed(2)}</div>
-                <div><strong>Net Return:</strong> ${(stake * odd).toFixed(2)}</div>
+            <div class="row mb-2">
+                <div class="col-4"><strong>Casa:</strong> ${bettingHouse}</div>
+                <div class="col-4"><strong>Stake:</strong> ${stake.toFixed(2)}</div>
+                <div class="col-4"><strong>Net Return:</strong> ${(stake * odd).toFixed(2)}</div>
             </div>
         `;
     }
@@ -128,21 +154,88 @@ function displayResults(returns, totalStake, resultsHTML) {
     const roi = (netProfit / totalStake) * 100;
 
     resultsHTML += `
-        <div class="result-row">
-            <div><strong>Total Stake Corrigido:</strong> ${totalStake.toFixed(2)}</div>
-            <div><strong>Net Profit:</strong> ${netProfit.toFixed(2)}</div>
-            <div><strong>ROI:</strong> ${roi.toFixed(2)}%</div>
+        <div class="row mb-2">
+            <div class="col-4"><strong>Total Stake:</strong> ${totalStake.toFixed(2)}</div>
+            <div class="col-4"><strong>Net Profit:</strong> ${netProfit.toFixed(2)}</div>
+            <div class="col-4"><strong>ROI:</strong> ${roi.toFixed(2)}%</div>
         </div>
     `;
 
     document.getElementById("resultContainer").innerHTML = resultsHTML;
 }
 
+
 document.getElementById("isFreeBet").addEventListener("change", function () {
     document.getElementById("freeBetFields").style.display = this.checked ? "block" : "none";
+    if (!this.checked) {
+        document.getElementById("promoName").value = "";
+    }
 });
 
 async function sendToGoogleSheets() {
+    // Limpar a classe de erro de todos os campos
+    document.querySelectorAll(".bet-row input").forEach(input => input.classList.remove("is-invalid"));
+    let resultIsEmpty =document.getElementById("resultContainer").innerText
+    console.log()
+    if(!resultIsEmpty) {
+        showError("Por favor, vocé precisar ter alguma resultado");
+        return;
+    }
+
+
+    const totalStake = parseFloat(document.getElementById("totalStake").value);
+    if (isNaN(totalStake) || totalStake <= 0) {
+        showError("Por favor, insira um valor válido para o total da aposta.");
+        document.getElementById("totalStake").classList.add("is-invalid");
+        return;
+    }
+
+    let isValid = true;
+    
+    document.querySelectorAll(".bet-row").forEach((betRow, index) => {
+        const odd = parseFloat(betRow.querySelector(`[id^=odd]`).value);
+        const stake = parseFloat(betRow.querySelector(`[id^=stake]`).value);
+        
+        if (isNaN(odd) || odd <= 0) {
+            isValid = false;
+            showError(`Por favor, insira uma odd válida para a aposta ${index + 1}.`);
+            betRow.querySelector(`[id^=odd]`).classList.add("is-invalid");
+        }
+        
+        if (isNaN(stake) || stake <= 0) {
+            isValid = false;
+            showError(`Por favor, insira um valor válido para a stake da aposta ${index + 1}.`);
+            betRow.querySelector(`[id^=stake]`).classList.add("is-invalid");
+        }
+    });
+
+    if (document.getElementById("isFreeBet").checked) {
+        const freeBetExpiry = document.getElementById("freeBetExpiry").value;
+        const freeBetReturn = parseFloat(document.getElementById("freeBetReturn").value);
+        
+        if (!freeBetExpiry) {
+            isValid = false;
+            showError("Por favor, insira a data de expiração da Free Bet.");
+            document.getElementById("freeBetExpiry").classList.add("is-invalid");
+        }
+        
+        if (isNaN(freeBetReturn) || freeBetReturn <= 0) {
+            isValid = false;
+            showError("Por favor, insira um valor válido para o retorno esperado da Free Bet.");
+            document.getElementById("freeBetReturn").classList.add("is-invalid");
+        }
+    }
+
+    // Se algum campo estiver inválido, interrompe o envio
+    if (!isValid) {
+        return;
+    }
+
+    // Exibe o modal de carregamento
+    const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
+    loadingModal.show();  // Exibe o modal
+
+    // Se tudo estiver válido, enviar os dados para o Google Sheets
     const bets = [];
 
     document.querySelectorAll(".bet-row").forEach((betRow, index) => {
@@ -153,12 +246,11 @@ async function sendToGoogleSheets() {
 
         bets.push({ bettingHouse, stake, odd, netReturn });
     });
-
-    const totalStake = document.getElementById("totalStake").value;
+    
     const netProfit = document.getElementById("resultContainer").innerText.match(/Net Profit:\s*(-?\d+\.\d+)/)[1];
     const roi = document.getElementById("resultContainer").innerText.match(/ROI:\s*(-?\d+\.\d+)%/)[1];
-
     const surebetId = Date.now().toString();
+
     const isFreeBet = document.getElementById("isFreeBet").checked;
     const freeBetExpiry = isFreeBet ? document.getElementById("freeBetExpiry").value : null;
     const freeBetReturn = isFreeBet ? document.getElementById("freeBetReturn").value : null;
@@ -169,12 +261,37 @@ async function sendToGoogleSheets() {
         const response = await fetch("https://script.google.com/macros/s/AKfycbwryZxhplBkvuvPBQF45zAvmc7MChMQMUkjUozY5feFabKPJY-aj9DrBhpgiA0djM48/exec", {
             method: 'POST',
             body: JSON.stringify(postData),
-            headers: { 'Content-Type':  'text/plain' }
+            headers: { 'Content-Type': 'text/plain' }
         });
 
         console.log("Success:", await response.json());
 
     } catch (error) {
         console.error("Error:", error);
+    } finally {
+        // Oculta o modal de carregamento após o envio
+        loadingModal.hide();  // Oculta o modal
     }
 }
+
+
+
+// Função para mostrar o erro usando Toastify
+function showError(message) {
+    Toastify({
+        text: message,
+        duration: 5000, // tempo em milissegundos
+        close: true,
+        gravity: "top", // posição no topo
+        position: "right", // à direita da tela
+        backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc3a0)",
+        stopOnFocus: true, // interrompe quando o usuário passa o mouse sobre
+        offset: {
+            x: 20, // Distância da borda lateral (em pixels)
+            y: 10  // Distância do topo (em pixels)
+        }
+    }).showToast();
+}
+
+
+
