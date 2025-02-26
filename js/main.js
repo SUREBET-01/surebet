@@ -88,7 +88,10 @@ function handleCalculation() {
         }
     });
 
-    $("#resultContainer").html(results.resultsHTML);  // Exibe os resultados
+    $("#resultResume").html(results.resultsResume)
+    $("#resultContainer").html(results.resultsHTML); 
+    calculateTotalStake();
+
 }
 
 

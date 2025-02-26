@@ -1,5 +1,6 @@
 import Bet from './Bet.js';
 
+
 class BetManager {
     constructor() {
         this.bets = [];
@@ -28,3 +29,5 @@ class BetManager {
 }
 
 export default BetManager;
+
+
