@@ -1,33 +1,23 @@
 import Bet from './Bet.js';
 
-
-class BetManager {
-    constructor() {
+export default class BetManager {
+    constructor(calculationService) {
         this.bets = [];
-        this.betCount = 0;    
+        this.betCount = 0;
+        this.calculationService = calculationService;
     }
 
-    addBet() {
-        this.betCount++;
-        const bet = new Bet(this.betCount, `Betting House ${this.betCount}`, 2.00, 0.00);
+    addBet(bettingHouse = `Betting House ${this.betCount + 1}`, odd = 2.0, stake = 0.0) {
+        const bet = new Bet(++this.betCount, bettingHouse, odd, stake);
         this.bets.push(bet);
         return bet;
     }
 
     removeBet(id) {
-        this.bets = this.bets.filter(bet => bet.id !== id);
-        this.betCount--;
+        this.bets = this.bets.filter((bet) => bet.id !== id);
     }
 
-    getBetById(id) {
-        return this.bets.find(bet => bet.id === id);
-    }
-
-    calculateTotalStake() {
-        return this.bets.reduce((total, bet) => total + bet.stake, 0);
+    calculateResults(totalStake, fixedBetId, roundStakes) {
+        return this.calculationService.calculate(this.bets, totalStake, fixedBetId, roundStakes);
     }
 }
-
-export default BetManager;
-
-

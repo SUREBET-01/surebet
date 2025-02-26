@@ -1,4 +1,4 @@
-class Validation {
+export default class Validation {
     static isValidStake(stake) {
         return !isNaN(stake) && stake > 0;
     }
@@ -7,5 +7,3 @@ class Validation {
         return !isNaN(odd) && odd > 0;
     }
 }
-
-export default Validation;
