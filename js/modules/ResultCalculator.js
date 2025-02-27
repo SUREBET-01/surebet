@@ -6,30 +6,85 @@ class ResultCalculator {
         isTotalInvestmentBase = true,
         shouldRoundStakes = false
     ) {
-        let totalInverseOdds = 0;
+        const { remainingStake, fixedStake, fixedReturn } =
+            this.calculateFixedBetValues(
+                bets,
+                totalStake,
+                fixedBetId,
+                isTotalInvestmentBase
+            );
+
+        const totalInverseOdds = this.calculateTotalInverseOdds(
+            bets,
+            fixedBetId,
+            isTotalInvestmentBase
+        );
+        const stakes = this.calculateStakes(
+            bets,
+            remainingStake,
+            fixedBetId,
+            isTotalInvestmentBase,
+            fixedReturn,
+            totalInverseOdds,
+            shouldRoundStakes,
+            fixedStake
+        );
+        const { resultsHTML, returns, avaregeProfit } = this.generateBetResults(
+            bets,
+            stakes
+        );
+        const { resultsResume, roi } = this.generateSummary(
+            returns,
+            stakes,
+            bets,
+            avaregeProfit
+        );
+
+        return { resultsHTML, roi, resultsResume };
+    }
+
+    static calculateFixedBetValues(
+        bets,
+        totalStake,
+        fixedBetId,
+        isTotalInvestmentBase
+    ) {
         let remainingStake = totalStake;
         let fixedStake = 0;
-        let fixedReturn = 0; // Nova variável para armazenar o retorno fixo
+        let fixedReturn = 0;
 
-        // Se uma aposta fixa for selecionada, subtrair sua stake da stake restante
         if (!isTotalInvestmentBase && fixedBetId) {
-            let fixedBet = bets.find((b) => b.id === fixedBetId);
+            const fixedBet = bets.find((bet) => bet.id === fixedBetId);
             if (fixedBet) {
                 fixedStake = fixedBet.stake;
-                fixedReturn = fixedStake * fixedBet.odd; // Calcular o retorno da aposta fixa
-                remainingStake -= fixedStake; // Subtrair a stake fixa do restante
+                fixedReturn = fixedStake * fixedBet.odd;
+                remainingStake -= fixedStake;
             }
         }
 
-        // Calcular as odds inversas para as apostas restantes
-        bets.forEach((bet) => {
-            if (!fixedBetId || isTotalInvestmentBase || bet.id !== fixedBetId) {
-                totalInverseOdds += 1 / bet.odd;
-            }
-        });
+        return { remainingStake, fixedStake, fixedReturn };
+    }
 
-        // Calcular as stakes para as apostas restantes, de forma que o retorno delas seja semelhante ao da aposta fixa
-        const stakes = bets.map((bet) => {
+    static calculateTotalInverseOdds(bets, fixedBetId, isTotalInvestmentBase) {
+        return bets.reduce((total, bet) => {
+            if (!fixedBetId || isTotalInvestmentBase || bet.id !== fixedBetId) {
+                return total + 1 / bet.odd;
+            }
+            return total;
+        }, 0);
+    }
+
+    static calculateStakes(
+        bets,
+        remainingStake,
+        fixedBetId,
+        isTotalInvestmentBase,
+        fixedReturn,
+        totalInverseOdds,
+        shouldRoundStakes,
+        fixedStake
+    ) {
+        return bets.map((bet) => {
             let stakeValue;
             if (!isTotalInvestmentBase && bet.id === fixedBetId) {
                 stakeValue = fixedStake;
@@ -39,21 +94,21 @@ class ResultCalculator {
                 stakeValue =
                     (remainingStake * (1 / bet.odd)) / totalInverseOdds;
             }
-            return shouldRoundStakes ? Math.round(stakeValue) : stakeValue; // Arredondamento aqui
+            return shouldRoundStakes ? Math.round(stakeValue) : stakeValue;
         });
+    }
 
+    static generateBetResults(bets, stakes) {
         let resultsHTML = '';
-        let resultsResume = '';
-        let returns = [];
-        let avaregeProfit = 0
+        const returns = [];
+        let avaregeProfit = 0;
+        const totalStake = this.sumStakes(stakes);
 
-        // Calcular os resultados de cada aposta
         bets.forEach((bet, index) => {
-            bet.stake = stakes[index]; // Atualizar a stake
-
+            bet.stake = stakes[index];
             const netReturn = bet.getNetReturn();
             returns.push(netReturn);
-            avaregeProfit += (netReturn - this.sumStakes(stakes));
+            avaregeProfit += netReturn - totalStake;
 
             resultsHTML += `
                 <tr>
@@ -62,43 +117,45 @@ class ResultCalculator {
                     <td>0.00</td>
                     <td>R$ ${netReturn.toFixed(2)}</td>
                     <td>R$ 0,00</td>
-                    <td>R$ ${(netReturn - this.sumStakes(stakes)).toFixed(
-                        2
-                    )}</td>
+                    <td>R$ ${(netReturn - totalStake).toFixed(2)}</td>
                 </tr>
             `;
         });
 
+        return { resultsHTML, returns, avaregeProfit };
+    }
 
-        const minReturn = Math.min(...returns); // O retorno mínimo
-        const netProfit = minReturn - this.sumStakes(stakes);
-        const roi = (netProfit / this.sumStakes(stakes)) * 100;
+    static generateSummary(returns, stakes, bets, avaregeProfit) {
+        const minReturn = Math.min(...returns);
+        const totalStake = this.sumStakes(stakes);
+        const netProfit = minReturn - totalStake;
+        const roi = (netProfit / totalStake) * 100;
 
-        resultsResume += `
+        const resultsResume = `
             <div class="col-md-6">
                 <div class="alert alert-success text-center">
-                    <strong>Lucro Total:</strong> R$ ${(avaregeProfit / bets.length).toFixed(2)}
+                    <strong>Lucro Total:</strong> R$
+                        <label id="avaregeProfit"> ${(
+                        avaregeProfit / bets.length
+                    ).toFixed(2)}</label>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="alert alert-success text-center">
-                    <strong>ROI:</strong> ${roi.toFixed(2)}%
+                    <strong>ROI:</strong>
+                        <label id="roi">
+                        ${roi.toFixed(2)}
+                        </label>%
                 </div>
-            </div>            
+            </div>
         `;
 
-        return { resultsHTML, netProfit, roi, resultsResume };
+        return { resultsResume, roi };
     }
 
-    static sumStakes(stake) {
-        let sum = 0;
-        for (let i = 0; i < stake.length; i++) {
-            sum += stake[i];
-        }
-        return sum;
+    static sumStakes(stakes) {
+        return stakes.reduce((sum, stake) => sum + stake, 0);
     }
-
-     
 }
 
 export default ResultCalculator;

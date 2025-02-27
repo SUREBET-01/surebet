@@ -19,6 +19,12 @@
             <!-- Bet Form (Now Above the Results Table) -->
             <div class="col-md-12">
                 <form id="betForm" class="p-3 border rounded bg-light">
+                    <div class="mb-1">
+                        <label for="cpfCount" class="form-label">Número de CPFs/Contas Usados</label>
+                        <input type="number" class="form-control" id="cpfCount" value="1" min="1">
+                    </div>
+                
+
                     <h3 class="mb-3">Adicionar Aposta</h3>
 
                     <!-- Total Investment -->
@@ -42,9 +48,13 @@
                     </div>
 
                     <!-- Buttons -->
-                    <div class="d-flex flex-wrap gap-2 mb-4">
-                        <button type="button" class="btn btn-primary" id="addBetButton">Adicionar Aposta</button>
-                        <button type="button" class="btn btn-warning" id="saveButton">Salvar no Google Sheets</button>
+                    <div class="d-flex justify-content-between mb-4" style="margin-top: 50px;">
+                        <div>
+                            <button type="button" class="btn btn-primary" id="addBetButton">Adicionar Aposta</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-warning" id="saveButton">Salvar no Google Sheets</button>
+                        </div>
                     </div>
 
                     <!-- Free Bet Checkbox -->
@@ -103,7 +113,8 @@
         </div>
 
         <!-- Modal for Loading -->
-        <div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true">
+            <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
             <div class="modal-dialog d-flex justify-content-center align-items-center">
                 <div class="modal-content text-center">
                     <div class="modal-body">

@@ -7,83 +7,145 @@ const betManager = new BetManager();
 let userEditingTotalStake = false;
 let userEditingStake = false;
 
-$(document).ready(function () {
-    initializeDefaultBets();
-    addInputListeners();
-    handleCalculation();
-});
+$(document).ready(initializePage);
 
-// Adicionar uma nova aposta
-$('#addBetButton').click(function () {
+function initializePage() {
+    initializeDefaultBets();
+    setupEventListeners();
+    handleCalculation();
+}
+
+function initializeDefaultBets() {
+    $('#totalStake').val(120);
+
+    betManager.addBet();
+    betManager.addBet();
+
+    betManager.bets.forEach((bet) => {
+        addBetRow(bet);
+    });
+
+    handleCalculation();
+}
+function setupEventListeners() {
+    $('#addBetButton').click(handleAddBet);
+    $('#roundStakesCheckbox').change(handleCalculation);
+    $('#isFreeBet').change(toggleFreeBetFields);
+    $('#cpfCount').on('input', handleCpfCountInput);
+    $('#saveButton').click(saveToGoogleSheets);
+
+    $(document)
+        .on('input', '.auto-calc, #totalStake', handleCalculation)
+        .on('input', ".auto-calc[id^='stake']", handleStakeInputChange)
+        .on('input', ".auto-calc[id^='odd']", handleOddInputChange)
+        .on('focus', '#totalStake', handleTotalStakeFocus)
+        .on('blur', '#totalStake', handleTotalStakeBlur)
+        .on('focus', '.stake-input', handleStakeInputFocus)
+        .on('blur', '.stake-input', handleStakeInputBlur)
+        .on('change', '.fixed-stake-radio', handleFixedStakeChange)
+        .on('click', '.delete-bet', handleDeleteBet)
+        .on('input', '.stake-input', handleManualStakeInput)
+        .on('input', "[id^='bettingHouse']", handleBettingHouseInput)
+        .on('input', "[id^='odd']", handleOddInput)
+        .on('input', handlePromoNameInput)
+        .on('input', handleFreeBetExpiryInput)
+        .on('input', handleFreeBetReturnInput);
+}
+
+function handleAddBet() {
     const bet = betManager.addBet();
     addBetRow(bet);
+    updateOddInputs();
     handleCalculation();
-});
+}
 
-function addInputListeners() {
-    $(document).on('input', '.auto-calc, #totalStake', function () {
-        handleCalculation();
-    });
+function handleStakeInputChange() {
+    calculateTotalStake();
+    handleCalculation();
+}
 
-    $(document).on('input', ".auto-calc[id^='stake']", function () {
-        calculateTotalStake();
-        handleCalculation();
-    });
-    $('#totalStake').on('input', function () {
-        autoSelectTotalInvestment(); // Ensure it's selected when typing
-        handleCalculation();
-    });
+function handleOddInputChange() {
+    const betId = $(this).closest('.bet-row').data('id');
+    const newOdd = parseFloat($(this).val()) || 0;
 
-    $('#totalStake').on('focus', function () {
-        userEditingTotalStake = true;
-        autoSelectTotalInvestment(); // Automatically select total investment option
-    });
+    const bet = betManager.bets.find((b) => b.id === betId);
+    if (bet) {
+        bet.odd = newOdd;
+    }
 
-    $('#totalStake').on('blur', function () {
-        userEditingTotalStake = false;
-        handleCalculation();
-    });
+    handleCalculation();
+}
 
-    $(document).on('focus', '.stake-input', function () {
-        userEditingStake = true; // Marca como editado manualmente
-    });
+function handleTotalStakeFocus() {
+    userEditingTotalStake = true;
+    autoSelectTotalInvestment();
+}
 
-    $(document).on('blur', '.stake-input', function () {
-        userEditingStake = false; // Marca como não editado manualmente
-        handleCalculation(); // Recalcula os resultados após a edição
-    });
+function handleTotalStakeBlur() {
+    userEditingTotalStake = false;
+    handleCalculation();
+}
 
-    $(document).on('input', ".auto-calc[id^='odd']", function () {
-        let betId = $(this).closest('.bet-row').data('id');
-        let newOdd = parseFloat($(this).val()) || 0;
+function handleStakeInputFocus() {
+    userEditingStake = true;
+}
 
-        let bet = betManager.bets.find((b) => b.id === betId);
-        if (bet) {
-            bet.odd = newOdd;
-        }
+function handleStakeInputBlur() {
+    userEditingStake = false;
+    handleCalculation();
+}
 
-        handleCalculation();
-    });
+function handleFixedStakeChange() {
+    const fixedBetId = $(this).data('id');
+    const bet = betManager.getBetById(fixedBetId);
+
+    if (bet) {
+        $('#stake' + fixedBetId).prop('readonly', false);
+    }
+
+    handleCalculation();
+}
+
+function handleDeleteBet() {
+    const id = $(this).data('id');
+    betManager.removeBet(id);
+    betManager.betCount--;
+    $(`.bet-row[data-id="${id}"]`).remove();
+    updateOddInputs();
+    handleCalculation();
+}
+
+function handleManualStakeInput() {
+    const betId = $(this).closest('.bet-row').data('id');
+    const newStake = parseFloat($(this).val()) || 0;
+
+    const bet = betManager.bets.find((b) => b.id === betId);
+    if (bet) {
+        bet.stake = newStake;
+    }
+
+    calculateTotalStake();
+    handleCalculation();
 }
 
 function handleCalculation() {
-    let totalStake = parseFloat($('#totalStake').val()) || 120;
+    const totalStake = parseFloat($('#totalStake').val()) || 120;
 
     if (!Validation.isValidStake(totalStake)) {
         showError('Please enter a valid total stake.');
         return;
     }
 
-    let fixedBetId = $('.fixed-stake-radio:checked').data('id') || null;
-    let isTotalInvestmentBase = $('#radioTotalInvestment').is(':checked');
-    let shouldRoundStakes = $('#roundStakesCheckbox').is(':checked'); // Verifica o estado do checkbox
+    const fixedBetId = $('.fixed-stake-radio:checked').data('id') || null;
+    const isTotalInvestmentBase = $('#radioTotalInvestment').is(':checked');
+    const shouldRoundStakes = $('#roundStakesCheckbox').is(':checked');
 
     const results = ResultCalculator.calculateResults(
         betManager.bets,
         totalStake,
         fixedBetId,
         isTotalInvestmentBase,
-        shouldRoundStakes // Novo parâmetro para controle do arredondamento
+        shouldRoundStakes
     );
 
     betManager.bets.forEach((bet) => {
@@ -102,7 +164,7 @@ function calculateTotalStake() {
 
     let total = 0;
     $('.bet-row').each(function () {
-        let stake =
+        const stake =
             parseFloat($(this).find(".auto-calc[id^='stake']").val()) || 0;
         total += stake;
     });
@@ -111,29 +173,8 @@ function calculateTotalStake() {
     return total;
 }
 
-// Inicializar apostas padrão
-function initializeDefaultBets() {
-    $('#totalStake').val(120); // Definir o investimento total padrão
-
-    const defaultBets = [
-        new Bet(1, 'Betting House 1', 2.0, 60),
-        new Bet(2, 'Betting House 2', 2.0, 60),
-    ];
-
-    defaultBets.forEach((bet) => {
-        betManager.addBet(bet);
-        addBetRow(bet);
-    });
-
-    handleCalculation(); // Garantir que os resultados apareçam logo no início
-}
-
-$('#roundStakesCheckbox').on('change', function () {
-    handleCalculation(); // Recalcula ao mudar o estado do checkbox
-});
-
 function addBetRow(bet) {
-    let deleteButton =
+    const deleteButton =
         bet.id > 2
             ? `
         <div class="col-md-2">
@@ -143,7 +184,7 @@ function addBetRow(bet) {
         </div>`
             : '';
 
-    let betRow = `
+    const betRow = `
         <div class="row g-3 bet-row mb-3" data-id="${bet.id}">
             <div class="col-md-1 d-flex align-items-center">
                 <input type="radio" name="calculationBase" class="form-check-input fixed-stake-radio" data-id="${bet.id}">
@@ -167,40 +208,6 @@ function addBetRow(bet) {
     $('#betContainer').append(betRow);
 }
 
-// Deletar aposta e recalcular os resultados
-$(document).on('click', '.delete-bet', function () {
-    let id = $(this).data('id');
-    betManager.removeBet(id);
-    $(`.bet-row[data-id="${id}"]`).remove();
-    handleCalculation(); // Recalcula os resultados após remover uma aposta
-});
-
-$(document).on('input', '.stake-input', function () {
-    let betId = $(this).closest('.bet-row').data('id');
-    let newStake = parseFloat($(this).val()) || 0;
-
-    let bet = betManager.bets.find((b) => b.id === betId);
-    if (bet) {
-        bet.stake = newStake;
-    }
-
-    let totalStake = betManager.bets.reduce((sum, b) => sum + b.stake, 0);
-    $('#totalStake').val(totalStake.toFixed(2));
-
-    handleCalculation();
-});
-$(document).on('change', '.fixed-stake-radio', function () {
-    let fixedBetId = $(this).data('id');
-    let bet = betManager.getBetById(fixedBetId);
-
-    if (bet) {
-        $('#stake' + fixedBetId).prop('readonly', false); // Permitir edição na stake fixa
-    }
-
-    handleCalculation();
-});
-
-// Exibir mensagens de erro
 function showError(message) {
     Toastify({
         text: message,
@@ -211,8 +218,196 @@ function showError(message) {
         backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc3a0)',
     }).showToast();
 }
+
 function autoSelectTotalInvestment() {
     if (!$('#radioTotalInvestment').is(':checked')) {
-        $('#radioTotalInvestment').prop('checked', true).trigger('change'); // Select and trigger change
+        $('#radioTotalInvestment').prop('checked', true).trigger('change');
     }
+}
+function handleBettingHouseInput() {
+    const betId = $(this).closest('.bet-row').data('id');
+    const bettingHouse = $(this).val();
+
+    if (!Validation.isValidBettingHouse(bettingHouse)) {
+        $(this).addClass('is-invalid');
+        showError('Please enter a valid betting house.');
+        return;
+    }
+
+    $(this).removeClass('is-invalid');
+
+    const bet = betManager.getBetById(betId);
+    if (bet) {
+        bet.bettingHouse = bettingHouse;
+    }
+}
+
+function handleOddInput() {
+    const betId = $(this).closest('.bet-row').data('id');
+    const odd = parseFloat($(this).val());
+
+    if (!Validation.isValidOdd(odd)) {
+        $(this).addClass('is-invalid');
+        showError('Please enter a valid odd.');
+        return;
+    }
+
+    $(this).removeClass('is-invalid');
+
+    const bet = betManager.getBetById(betId);
+    if (bet) {
+        bet.odd = odd;
+    }
+
+    handleCalculation();
+}
+
+function toggleFreeBetFields() {
+    const isFreeBet = $('#isFreeBet').is(':checked');
+    $('#freeBetFields').toggle(isFreeBet);
+}
+
+function updateOddInputs() {
+    const bets = betManager.getBets();
+    bets.forEach((bet) => {
+        $(`#odd${bet.id}`).val(bet.odd);
+    });
+}
+function handlePromoNameInput() {
+    if (!$('#isFreeBet').is(':checked')) return;
+
+    const promoName = $('#promoName').val();
+
+    if (!Validation.isValidPromoName(promoName)) {
+        $('#promoName').addClass('is-invalid');
+        showError('Please enter a valid promotion name.');
+        return;
+    }
+
+    $('#promoName').removeClass('is-invalid');
+}
+
+function handleFreeBetExpiryInput() {
+    if (!$('#isFreeBet').is(':checked')) return;
+
+    const freeBetExpiry = $('#freeBetExpiry').val();
+
+    if (!Validation.isValidFreeBetExpiry(freeBetExpiry)) {
+        $('#freeBetExpiry').addClass('is-invalid');
+        showError('Please select a valid expiry date.');
+        return;
+    }
+
+    $('#freeBetExpiry').removeClass('is-invalid');
+}
+
+function handleFreeBetReturnInput() {
+    if (!$('#isFreeBet').is(':checked')) return;
+
+    const freeBetReturn = parseFloat($('#freeBetReturn').val());
+
+    if (!Validation.isValidFreeBetReturn(freeBetReturn)) {
+        $('#freeBetReturn').addClass('is-invalid');
+        showError('Please enter a valid expected return.');
+        return;
+    }
+
+    $('#freeBetReturn').removeClass('is-invalid');
+}
+function handleCpfCountInput() {
+    const cpfCount = parseInt($('#cpfCount').val());
+
+    if (!Validation.isValidCpfCount(cpfCount)) {
+        $('#cpfCount').addClass('is-invalid');
+        showError('Por favor, insira um número válido de CPFs/Contas.');
+        return;
+    }
+
+    $('#cpfCount').removeClass('is-invalid');
+}
+
+function saveToGoogleSheets() {
+    const totalStake = parseFloat($('#totalStake').val());
+    const bets = betManager.getBets().map((bet) => ({
+        bettingHouse: bet.bettingHouse,
+        odd: bet.odd,
+        stake: bet.stake,
+        netReturn: bet.getNetReturn(),
+        probability: 0, //  (0 por enquanto)
+        commission: 0, //  (0 por enquanto)
+        netReturnByBet: (bet.getNetReturn() - totalStake).toFixed(2),
+    }));
+
+    const isFreeBet = $('#isFreeBet').is(':checked');
+    const promoName = $('#promoName').val();
+    const freeBetExpiry = $('#freeBetExpiry').val();
+    const freeBetReturn = parseFloat($('#freeBetReturn').val());
+    const cpfCount = parseInt($('#cpfCount').val());
+
+    if (
+        !Validation.isValidTotalStake(totalStake) ||
+        !bets.every(
+            (bet) =>
+                Validation.isValidBettingHouse(bet.bettingHouse) &&
+                Validation.isValidOdd(bet.odd) &&
+                Validation.isValidStake(bet.stake)
+        ) ||
+        (isFreeBet &&
+            (!Validation.isValidPromoName(promoName) ||
+                !Validation.isValidFreeBetExpiry(freeBetExpiry) ||
+                !Validation.isValidFreeBetReturn(freeBetReturn))) ||
+        !Validation.isValidCpfCount(cpfCount)
+    ) {
+        showError('Por favor, corrija os erros nos campos antes de salvar.');
+        return;
+    }
+
+    const surebetId = Date.now();
+    const roi = parseFloat($('#roi').text());
+    const netProfit = parseFloat($('#avaregeProfit').text());
+
+    $('#loadingModal').modal('show');
+
+    $.ajax({
+        url: 'https://script.google.com/macros/s/AKfycbwryZxhplBkvuvPBQF45zAvmc7MChMQMUkjUozY5feFabKPJY-aj9DrBhpgiA0djM48/exec', // Substitua pelo URL do seu script
+        type: 'POST',
+        contentType: 'text/plain',
+        data: JSON.stringify({
+            bets: bets,
+            totalStake: totalStake,
+            netProfit: netProfit,
+            roi: roi,
+            surebetId: surebetId,
+            isFreeBet: isFreeBet,
+            freeBetExpiry: freeBetExpiry,
+            freeBetReturn: freeBetReturn,
+            accoutsUsed: cpfCount,
+        }),
+        success: function (response) {
+            if (response.status === 'success') {
+                $('#loadingModal').modal('hide');
+                showSuccess(
+                    'Dados salvos com sucesso! Surebet ID: ' +
+                        response.surebetId
+                );
+            } else {
+                showError('Erro ao salvar os dados: ' + response.message);
+            }
+        },
+        error: function (error) {
+            $('#loadingModal').modal('hide');
+            showError('Erro ao enviar os dados: ' + error.responseText);
+        },
+    });
+}
+
+function showSuccess(message) {
+    Toastify({
+        text: message,
+        duration: 5000,
+        close: true,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)',
+    }).showToast();
 }
