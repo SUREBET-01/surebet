@@ -1,4 +1,3 @@
-// Validation.js
 export default class Validation {
     static isValidBettingHouse(bettingHouse) {
         return typeof bettingHouse === 'string' && bettingHouse.trim() !== '';
