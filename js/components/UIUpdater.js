@@ -1,6 +1,5 @@
-import Validation from "../utils/Validation.js";
-import ResultCalculator from "./calculation/ResultCalculator.js";
-import BetManager from "./BetManager.js";
+import Validation from '../utils/Validation.js';
+import ResultCalculator from '../calculations/ResultCalculator.js';
 
 export default class UIUpdater {
     constructor(betManager) {
@@ -18,7 +17,10 @@ export default class UIUpdater {
     }
 
     addBetRow(bet) {
-        const deleteButton = bet.id > 2 ? `<div class="col-md-2"><button type="button" class="btn btn-danger delete-bet" data-id="${bet.id}" style="margin-top: 30px"><i class="fas fa-trash"></i></button></div>` : '';
+        const deleteButton =
+            bet.id > 2
+                ? `<div class="col-md-2"><button type="button" class="btn btn-danger delete-bet" data-id="${bet.id}" style="margin-top: 30px"><i class="fas fa-trash"></i></button></div>`
+                : '';
         const betRow = `<div class="row g-3 bet-row mb-3" data-id="${bet.id}">
         <div class="col-md-1 d-flex align-items-center">
                 <input type="radio" name="calculationBase" class="form-check-input fixed-stake-radio" data-id="${bet.id}">
@@ -48,7 +50,13 @@ export default class UIUpdater {
         const fixedBetId = $('.fixed-stake-radio:checked').data('id') || null;
         const isTotalInvestmentBase = $('#radioTotalInvestment').is(':checked');
         const shouldRoundStakes = $('#roundStakesCheckbox').is(':checked');
-        const results = ResultCalculator.calculateResults(this.betManager.bets, totalStake, fixedBetId, isTotalInvestmentBase, shouldRoundStakes);
+        const results = ResultCalculator.calculateResults(
+            this.betManager.bets,
+            totalStake,
+            fixedBetId,
+            isTotalInvestmentBase,
+            shouldRoundStakes
+        );
         this.betManager.bets.forEach((bet) => {
             if (!this.userEditingStake) {
                 $(`#stake${bet.id}`).val(bet.stake.toFixed(2));
@@ -63,7 +71,8 @@ export default class UIUpdater {
         if (this.userEditingTotalStake) return;
         let total = 0;
         $('.bet-row').each(function () {
-            const stake = parseFloat($(this).find(".auto-calc[id^='stake']").val()) || 0;
+            const stake =
+                parseFloat($(this).find(".auto-calc[id^='stake']").val()) || 0;
             total += stake;
         });
         $('#totalStake').val(total.toFixed(2));

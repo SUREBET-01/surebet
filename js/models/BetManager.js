@@ -1,4 +1,4 @@
-import Bet from './Bet.js';
+import Bet from '../models/Bet.js';
 
 export default class BetManager {
     constructor(calculationService) {

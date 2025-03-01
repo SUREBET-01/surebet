@@ -4,7 +4,7 @@ import {
     handlePromoNameInput,
     handleFreeBetExpiryInput,
     handleFreeBetReturnInput,
-} from '../modules/eventHandlers.js';
+} from '../events/eventHandlers.js';
 export default class GoogleSheetsService {
     constructor(betManager) {
         this.betManager = betManager;
