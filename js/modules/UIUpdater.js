@@ -1,5 +1,5 @@
 import Validation from "../utils/Validation.js";
-import ResultCalculator from "./ResultCalculator.js";
+import ResultCalculator from "./calculation/ResultCalculator.js";
 import BetManager from "./BetManager.js";
 
 export default class UIUpdater {

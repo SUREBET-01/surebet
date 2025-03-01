@@ -1,6 +1,5 @@
-// main.js
 import BetManager from './modules/BetManager.js';
-import ResultCalculator from './modules/ResultCalculator.js';
+import ResultCalculator from './modules/calculation/ResultCalculator.js';
 import Validation from './utils/Validation.js';
 import UIUpdater from './modules/UIUpdater.js';
 import GoogleSheetsService from './services/GoogleSheetsService.js';
@@ -16,7 +15,7 @@ const googleSheetsService = new GoogleSheetsService(
     betManager,
     validation,
     uiUpdater
-); // Correct instantiation
+); 
 
 $(document).ready(() => {
     uiUpdater.initializeDefaultBets();
