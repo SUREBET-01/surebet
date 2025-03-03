@@ -10,7 +10,8 @@ export default class ResultCalculator {
         totalStake,
         fixedBetId = null,
         isTotalInvestmentBase = true,
-        shouldRoundStakes = false
+        shouldRoundStakes = false,
+        isEditManualy = false
     ) {
         const { remainingStake, fixedStake, fixedReturn } =
             FixedBetCalculator.calculateFixedBetValues(
@@ -20,22 +21,27 @@ export default class ResultCalculator {
                 isTotalInvestmentBase
             );
 
-        const totalInverseOdds = InverseOddsCalculator.calculateTotalInverseOdds(
-            bets,
-            fixedBetId,
-            isTotalInvestmentBase
-        );
-
-        const stakes = StakeCalculator.calculateStakes(
-            bets,
-            remainingStake,
-            fixedBetId,
-            isTotalInvestmentBase,
-            fixedReturn,
-            totalInverseOdds,
-            shouldRoundStakes,
-            fixedStake
-        );
+        const totalInverseOdds =
+            InverseOddsCalculator.calculateTotalInverseOdds(
+                bets,
+                fixedBetId,
+                isTotalInvestmentBase
+            );
+        let stakes = [];
+        if (!isEditManualy) {
+            stakes = StakeCalculator.calculateStakes(
+                bets,
+                remainingStake,
+                fixedBetId,
+                isTotalInvestmentBase,
+                fixedReturn,
+                totalInverseOdds,
+                shouldRoundStakes,
+                fixedStake
+            );
+        } else {
+            stakes = StakeCalculator.getStakes(bets);
+        }
 
         const { resultsHTML, returns, avaregeProfit } =
             BetResultGenerator.generateBetResults(bets, stakes);

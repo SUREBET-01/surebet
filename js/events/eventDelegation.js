@@ -1,6 +1,5 @@
 import {
     handleAddBet,
-    handleStakeInputChange,
     handleOddInputChange,
     handleFixedStakeChange,
     handleDeleteBet,
@@ -13,22 +12,20 @@ import {
 export const setupEventListeners = (
     betManager,
     uiUpdater,
-    googleSheetsService, // Add googleSheetsService as a parameter
+    googleSheetsService,
 ) => {
     $('#addBetButton').click(() => handleAddBet(betManager, uiUpdater));
     $('#roundStakesCheckbox').change(() => uiUpdater.handleCalculation());
     $('#isFreeBet').change(() => uiUpdater.toggleFreeBetFields());
     $('#cpfCount').on('input', (event) => handleCpfCountInput(event));
-    $('#saveButton').click(() => googleSheetsService.saveToGoogleSheets()); // Use googleSheetsService
+    $('#saveButton').click(() => googleSheetsService.saveToGoogleSheets()); 
 
     $(document)
         .on('input', '.auto-calc, #totalStake', () => uiUpdater.handleCalculation())
-        .on('input', ".auto-calc[id^='stake']", (event) => handleStakeInputChange(uiUpdater, event))
         .on('input', ".auto-calc[id^='odd']", (event) => handleOddInputChange(betManager, uiUpdater, event))
         .on('focus', '#totalStake', () => uiUpdater.handleTotalStakeFocus())
         .on('blur', '#totalStake', () => uiUpdater.handleTotalStakeBlur())
         .on('focus', '.stake-input', () => uiUpdater.handleStakeInputFocus())
-        .on('blur', '.stake-input', () => uiUpdater.handleStakeInputBlur())
         .on('change', '.fixed-stake-radio', (event) => handleFixedStakeChange(betManager, uiUpdater, event))
         .on('click', '.delete-bet', (event) => handleDeleteBet(betManager, uiUpdater, event))
         .on('input', '.stake-input', (event) => handleManualStakeInput(betManager, uiUpdater, event))

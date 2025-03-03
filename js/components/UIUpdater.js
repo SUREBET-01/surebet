@@ -47,6 +47,9 @@ export default class UIUpdater {
             this.toastManager.showError('Please enter a valid total stake.');
             return;
         }
+
+
+        
         const fixedBetId = $('.fixed-stake-radio:checked').data('id') || null;
         const isTotalInvestmentBase = $('#radioTotalInvestment').is(':checked');
         const shouldRoundStakes = $('#roundStakesCheckbox').is(':checked');
@@ -55,7 +58,8 @@ export default class UIUpdater {
             totalStake,
             fixedBetId,
             isTotalInvestmentBase,
-            shouldRoundStakes
+            shouldRoundStakes,
+            this.userEditingStake
         );
         this.betManager.bets.forEach((bet) => {
             if (!this.userEditingStake) {
@@ -92,12 +96,7 @@ export default class UIUpdater {
     handleStakeInputFocus() {
         this.userEditingStake = true;
     }
-
-    handleStakeInputBlur() {
-        this.userEditingStake = false;
-        this.handleCalculation();
-    }
-
+    
     autoSelectTotalInvestment() {
         if (!$('#radioTotalInvestment').is(':checked')) {
             $('#radioTotalInvestment').prop('checked', true).trigger('change');

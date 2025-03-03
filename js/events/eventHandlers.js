@@ -9,11 +9,6 @@ export const handleAddBet = (betManager, uiUpdater) => {
     uiUpdater.handleCalculation();
 };
 
-// Stake Input Change
-export const handleStakeInputChange = (uiUpdater) => {
-    uiUpdater.calculateTotalStake();
-    uiUpdater.handleCalculation();
-};
 
 // Odd Input Change
 export const handleOddInputChange = (betManager, uiUpdater, event) => {
@@ -23,6 +18,7 @@ export const handleOddInputChange = (betManager, uiUpdater, event) => {
     if (bet) {
         bet.odd = newOdd;
     }
+
     uiUpdater.handleCalculation();
 };
 
@@ -33,6 +29,7 @@ export const handleFixedStakeChange = (betManager, uiUpdater, event) => {
     if (bet) {
         $(`#stake${fixedBetId}`).prop('readonly', false);
     }
+    uiUpdater.userEditingStake = false;
     uiUpdater.handleCalculation();
 };
 

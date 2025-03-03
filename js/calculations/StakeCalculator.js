@@ -26,4 +26,8 @@ export class StakeCalculator {
     static sumStakes(stakes) {
         return stakes.reduce((sum, stake) => sum + stake, 0);
     }
+
+    static getStakes(bets) {
+       return bets.map(item => item.stake);
+    }
 }
