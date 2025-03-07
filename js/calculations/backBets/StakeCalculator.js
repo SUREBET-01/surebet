@@ -28,6 +28,7 @@ export class StakeCalculator {
     }
 
     static getStakes(bets) {
-       return bets.map(item => item.stake);
+        return bets.map((item) => item.stake);
     }
+
 }

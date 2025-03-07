@@ -6,13 +6,13 @@ import {
     handleFreeBetReturnInput,
 } from '../events/eventHandlers.js';
 export default class GoogleSheetsService {
-    constructor(betManager) {
-        this.betManager = betManager;
+    constructor(BetManager) {
+        this.BetManager = BetManager;
     }
 
     saveToGoogleSheets() {
         const totalStake = parseFloat($('#totalStake').val());
-        const bets = this.betManager.bets.map((bet) => ({
+        const bets = this.BetManager.bets.map((bet) => ({
             bettingHouse: bet.bettingHouse,
             odd: bet.odd,
             stake: bet.stake,

@@ -1,17 +1,16 @@
 import { FixedBetCalculator } from './FixedBetCalculator.js';
 import { InverseOddsCalculator } from './InverseOddsCalculator.js';
 import { StakeCalculator } from './StakeCalculator.js';
-import { BetResultGenerator } from './BetResultGenerator.js';
-import { SummaryGenerator } from './SummaryGenerator.js';
+import { BetResultGenerator } from '../BetResultGenerator.js';
+import { SummaryGenerator } from '../SummaryGenerator.js';
 
-export default class ResultCalculator {
+export default class CalculatorBackBet {
     static calculateResults(
         bets,
         totalStake,
         fixedBetId = null,
         isTotalInvestmentBase = true,
-        shouldRoundStakes = false,
-        isEditManualy = false
+        shouldRoundStakes = false
     ) {
         const { remainingStake, fixedStake, fixedReturn } =
             FixedBetCalculator.calculateFixedBetValues(
@@ -27,8 +26,13 @@ export default class ResultCalculator {
                 fixedBetId,
                 isTotalInvestmentBase
             );
+
         let stakes = [];
-        if (!isEditManualy) {
+        const manuallyEditedBet = bets.find(
+            (bet) => bet.isEditManualy === true
+        );
+
+        if (!manuallyEditedBet) {
             stakes = StakeCalculator.calculateStakes(
                 bets,
                 remainingStake,
@@ -52,7 +56,6 @@ export default class ResultCalculator {
             bets,
             avaregeProfit
         );
-
         return { resultsHTML, roi, resultsResume };
     }
 }

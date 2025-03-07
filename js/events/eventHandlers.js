@@ -1,14 +1,14 @@
 import Validation from '../utils/Validation.js';
 import ToastManager from '../utils/ToastManager.js';
+import CalculatorLayBet from '../calculations/laybets/CalculatorLayBet.js';
 
 // Add Bet
 export const handleAddBet = (betManager, uiUpdater) => {
     const bet = betManager.addBet();
     uiUpdater.addBetRow(bet);
     uiUpdater.updateOddInputs();
-    uiUpdater.handleCalculation();
+    uiUpdater.handleBackBetCalculation();
 };
-
 
 // Odd Input Change
 export const handleOddInputChange = (betManager, uiUpdater, event) => {
@@ -19,7 +19,7 @@ export const handleOddInputChange = (betManager, uiUpdater, event) => {
         bet.odd = newOdd;
     }
 
-    uiUpdater.handleCalculation();
+    uiUpdater.handleBackBetCalculation();
 };
 
 // Fixed Stake Change
@@ -29,8 +29,28 @@ export const handleFixedStakeChange = (betManager, uiUpdater, event) => {
     if (bet) {
         $(`#stake${fixedBetId}`).prop('readonly', false);
     }
-    uiUpdater.userEditingStake = false;
-    uiUpdater.handleCalculation();
+    uiUpdater.handleBackBetCalculation();
+};
+
+// Lay Bet Change
+export const handleLayBet = (betManager, event, uiUpdater) => {
+    const betId = $(event.target).data('id');
+    const bet = betManager.getBetById(betId);
+
+    bet.isLayBet = $(event.target).prop('checked');
+
+    const backerStakeContainer = $(`#backerStakeContainer${betId}`);
+
+    if ($(event.target).prop('checked')) {
+        $(`#label-stake${betId}`).text('Liabilities');
+        $(`#label-odd${betId}`).text('Lay Odds');
+        backerStakeContainer.removeClass('d-none');
+    } else {
+        $(`#label-stake${betId}`).text('Stake');
+        $(`#label-odd${betId}`).text('Odds');
+        backerStakeContainer.addClass('d-none');
+    }
+    handleLayBets(betManager, uiUpdater);
 };
 
 // Delete Bet
@@ -39,19 +59,24 @@ export const handleDeleteBet = (betManager, uiUpdater, event) => {
     betManager.removeBet(id);
     $(`.bet-row[data-id="${id}"]`).remove();
     uiUpdater.updateOddInputs();
-    uiUpdater.handleCalculation();
+    uiUpdater.handleBackBetCalculation();
 };
 
 // Manual Stake Input
 export const handleManualStakeInput = (betManager, uiUpdater, event) => {
+    const $input = $(event.target);
     const betId = $(event.target).closest('.bet-row').data('id');
     const newStake = parseFloat($(event.target).val()) || 0;
     const bet = betManager.getBetById(betId);
+
     if (bet) {
         bet.stake = newStake;
+        bet.isEditManualy = true;
+        $input.val(newStake);
     }
+
     uiUpdater.calculateTotalStake();
-    uiUpdater.handleCalculation();
+    uiUpdater.handleBackBetCalculation();
 };
 
 // Betting House Input
@@ -84,6 +109,30 @@ export const handleOddInput = (betManager, event) => {
     if (bet) {
         bet.odd = odd;
     }
+};
+
+const handleLayBets = (betManager, uiUpdater) => {
+    const layBets = betManager.getLayBets();
+    const backBets = betManager.getBackBets();
+
+    if (!layBets || !backBets) return;
+
+    const results = CalculatorLayBet.calculateLayConversion(
+        layBets,
+        backBets,
+        $('#totalStake').val()
+    );
+
+    betManager.bets.forEach((bet) => {
+        betManager.updateBetStake(bet, results);
+        if (bet.id === results.layBet.id) {
+            uiUpdater.updateLayBetUI(results, bet);
+        } else if (bet.id === results.backBet.id) {
+            uiUpdater.updateBackBetUI(results, bet);
+        }
+    });
+
+    uiUpdater.handleLayBetCalculation(results);
 };
 
 // Promo Name Input

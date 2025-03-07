@@ -1,16 +1,13 @@
-import { StakeCalculator } from "./backBets/StakeCalculator.js";
-export class BetResultGenerator {
+export default class LayBetResult {
+
     static generateBetResults(bets, stakes) {
         let resultsHTML = '';
         const returns = [];
         let avaregeProfit = 0;
         const totalStake = StakeCalculator.sumStakes(stakes);
 
-        bets.forEach((bet, index) => {
+        bets.forEach((bet) => {
             bet.stake = stakes[index];
-            const netReturn = bet.getNetReturn();
-            returns.push(netReturn);
-            avaregeProfit += netReturn - totalStake;
 
             resultsHTML += `
                 <tr>
@@ -25,5 +22,7 @@ export class BetResultGenerator {
         });
 
         return { resultsHTML, returns, avaregeProfit };
+
     }
+
 }

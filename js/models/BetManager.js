@@ -1,4 +1,4 @@
-import Bet from '../models/Bet.js';
+import Bet from './Bet.js';
 
 export default class BetManager {
     constructor(calculationService) {
@@ -8,8 +8,8 @@ export default class BetManager {
     }
 
     addBet(
-        bettingHouse = `Betting House ${this.bets.length + 1}`, 
-        odd = this.bets.length + 1, 
+        bettingHouse = `Betting House ${this.bets.length + 1}`,
+        odd = this.bets.length + 1,
         stake = 0.0
     ) {
         const bet = new Bet(++this.betCount, bettingHouse, odd, stake);
@@ -23,8 +23,8 @@ export default class BetManager {
 
     removeBet(id) {
         this.bets = this.bets.filter((bet) => bet.id !== id);
-        this.updateBettingHouseNames(); 
-        this.updateOdds(); 
+        this.updateBettingHouseNames();
+        this.updateOdds();
     }
 
     getBetById(id) {
@@ -42,7 +42,7 @@ export default class BetManager {
 
     updateBettingHouseNames() {
         this.bets.forEach((bet, index) => {
-            bet.bettingHouse = `Betting House ${index + 1}`; 
+            bet.bettingHouse = `Betting House ${index + 1}`;
         });
     }
 
@@ -51,5 +51,28 @@ export default class BetManager {
         this.bets.forEach((bet) => {
             bet.odd = numberOfBets;
         });
+    }
+
+    getLayBets() {
+        return this.bets.find((bet) => bet.isLayBet === true);
+    }
+    getBackBets() {
+        return this.bets.find((bet) => bet.isLayBet !== true);
+    }
+
+    resetAllEditStatus() {
+        this.bets.forEach((bet) => {
+            bet.isEditManualy = false;
+        });
+    }
+
+    updateBetStake(bet, results) {
+        if (bet.id === results.layBet.id) {
+            bet.stake = results.layBet.liability;
+            bet.backerStake = results.layBet.backerStake;
+            bet.liability = results.layBet.liability;
+        } else if (bet.id === results.backBet.id) {
+            bet.stake = results.backBet.stake;
+        }
     }
 }

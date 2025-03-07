@@ -1,4 +1,4 @@
-import { StakeCalculator } from "./StakeCalculator.js";
+import { StakeCalculator } from './backBets/StakeCalculator.js';
 
 export class SummaryGenerator {
     static generateSummary(returns, stakes, bets, avaregeProfit) {
@@ -12,8 +12,8 @@ export class SummaryGenerator {
                 <div class="alert alert-success text-center">
                     <strong>Lucro Total:</strong> R$
                         <label id="avaregeProfit"> ${(
-                        avaregeProfit / bets.length
-                    ).toFixed(2)}</label>
+                            avaregeProfit / bets.length
+                        ).toFixed(2)}</label>
                 </div>
             </div>
             <div class="col-md-6">
