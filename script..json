@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "bettingHouse": "Betting House 1",
+        "odd": 4.5,
+        "stake": 44.65,
+        "isLayBet": true,
+        "backerStake": 23.13, 
+        "liability":80.96, 
+        "isEditManualy": false
+    },
+    {
+        "id": 2,
+        "bettingHouse": "Betting House 2",
+        "odd": 4.8,
+        "stake": 21.69,
+        "isLayBet": false,
+        "backerStake": 0,
+        "liability": 0,
+        "isEditManualy": false
+    },
+    {
+        "id": 3,
+        "bettingHouse": "Betting House 3",
+        "odd": 6.0,
+        "stake": 17.35,
+        "isLayBet": false,
+        "backerStake": 0,
+        "liability": 0,
+        "isEditManualy": false
+    }
+]

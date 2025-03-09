@@ -107,21 +107,13 @@ export default class UIUpdater {
                 bet.stake = currentInputValue;
             }
         });
+        console.log(this.betManager.bets)
         $('#resultResume').html(results.resultsResume);
         $('#resultContainer').html(results.resultsHTML);
         this.calculateTotalStake();
         this.betManager.resetAllEditStatus();
     }
 
-    handleLayBetCalculation(results) {
-        console.log(results);
-
-        const profit = CalculatorLayBet.calculatelayProfit(
-            results.layBet,
-            results.backBet
-        );
-        console.log(profit);
-    }
     calculateTotalStake() {
         if (this.userEditingTotalStake) return;
         let total = 0;

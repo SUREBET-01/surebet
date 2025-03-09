@@ -50,7 +50,9 @@ export const handleLayBet = (betManager, event, uiUpdater) => {
         $(`#label-odd${betId}`).text('Odds');
         backerStakeContainer.addClass('d-none');
     }
-    handleLayBets(betManager, uiUpdater);
+    if (bet.isLayBet) {
+        console.log(CalculatorLayBet.calculateLayConversion(betManager.bets));
+    }
 };
 
 // Delete Bet
@@ -109,30 +111,6 @@ export const handleOddInput = (betManager, event) => {
     if (bet) {
         bet.odd = odd;
     }
-};
-
-const handleLayBets = (betManager, uiUpdater) => {
-    const layBets = betManager.getLayBets();
-    const backBets = betManager.getBackBets();
-
-    if (!layBets || !backBets) return;
-
-    const results = CalculatorLayBet.calculateLayConversion(
-        layBets,
-        backBets,
-        $('#totalStake').val()
-    );
-
-    betManager.bets.forEach((bet) => {
-        betManager.updateBetStake(bet, results);
-        if (bet.id === results.layBet.id) {
-            uiUpdater.updateLayBetUI(results, bet);
-        } else if (bet.id === results.backBet.id) {
-            uiUpdater.updateBackBetUI(results, bet);
-        }
-    });
-
-    uiUpdater.handleLayBetCalculation(results);
 };
 
 // Promo Name Input

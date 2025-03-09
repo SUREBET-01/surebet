@@ -15,7 +15,7 @@ export default class Bet {
         this.stake = stake;
         this.isLayBet = isLayBet;
         this.backerStake = backerStake;
-        this.liabilities = liability;
+        this.liability = liability;
         this.isEditManualy = isEditManualy;
     }
 
