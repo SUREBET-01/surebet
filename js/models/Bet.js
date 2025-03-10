@@ -7,7 +7,11 @@ export default class Bet {
         isLayBet = false, 
         backerStake = 0, 
         liability = 0, 
-        isEditManualy = false
+        isEditManualy = false,
+        profit = 0,
+        comission = 0,
+        probability = 0,
+        editedField = ''
     ) {
         this.id = id;
         this.bettingHouse = bettingHouse;
@@ -17,9 +21,13 @@ export default class Bet {
         this.backerStake = backerStake;
         this.liability = liability;
         this.isEditManualy = isEditManualy;
+        this.profit = profit;
+        this.comission = comission;
+        this.probability = probability;
+        this.editedField = editedField;
     }
 
-    getNetReturn() {
-        return this.stake * this.odd;
+    getNetReturn(bet) {
+        return bet.stake * bet.odd;
     }
 }

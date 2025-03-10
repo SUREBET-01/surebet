@@ -1,13 +1,12 @@
 import Validation from '../utils/Validation.js';
 import ToastManager from '../utils/ToastManager.js';
-import CalculatorLayBet from '../calculations/laybets/CalculatorLayBet.js';
 
 // Add Bet
 export const handleAddBet = (betManager, uiUpdater) => {
     const bet = betManager.addBet();
     uiUpdater.addBetRow(bet);
     uiUpdater.updateOddInputs();
-    uiUpdater.handleBackBetCalculation();
+    uiUpdater.handleBetsCalculate();
 };
 
 // Odd Input Change
@@ -15,21 +14,28 @@ export const handleOddInputChange = (betManager, uiUpdater, event) => {
     const betId = $(event.target).closest('.bet-row').data('id');
     const newOdd = parseFloat($(event.target).val()) || 0;
     const bet = betManager.getBetById(betId);
+
+    if (!Validation.isValidOdd(newOdd)) {
+        $(event.target).addClass('is-invalid');
+        ToastManager.showError('Please enter a valid odd.');
+        return;
+    }
+    $(event.target).removeClass('is-invalid');
     if (bet) {
         bet.odd = newOdd;
     }
 
-    uiUpdater.handleBackBetCalculation();
+    uiUpdater.handleBetsCalculate();
 };
 
 // Fixed Stake Change
-export const handleFixedStakeChange = (betManager, uiUpdater, event) => {
-    const fixedBetId = $(event.target).data('id');
-    const bet = betManager.getBetById(fixedBetId);
-    if (bet) {
-        $(`#stake${fixedBetId}`).prop('readonly', false);
-    }
-    uiUpdater.handleBackBetCalculation();
+export const handleFixedStakeChange = (uiUpdater, event) => {
+    // Desmarca todos os radio buttons
+    $('.fixed-stake-radio').prop('checked', false);
+
+    // Marca apenas o que foi clicado
+    $(event.target).prop('checked', true);
+    uiUpdater.handleBetsCalculate();
 };
 
 // Lay Bet Change
@@ -50,8 +56,18 @@ export const handleLayBet = (betManager, event, uiUpdater) => {
         $(`#label-odd${betId}`).text('Odds');
         backerStakeContainer.addClass('d-none');
     }
-    if (bet.isLayBet) {
-        console.log(CalculatorLayBet.calculateLayConversion(betManager.bets));
+
+    uiUpdater.handleLayBetCalculation(betManager.bets);
+};
+
+// handle Comission checkbox
+export const handleComissionCheckBox = (event) => {
+    const comissionContainer = $(`.comissionContainer`);
+
+    if ($(event.target).prop('checked')) {
+        comissionContainer.removeClass('d-none');
+    } else {
+        comissionContainer.addClass('d-none');
     }
 };
 
@@ -61,24 +77,31 @@ export const handleDeleteBet = (betManager, uiUpdater, event) => {
     betManager.removeBet(id);
     $(`.bet-row[data-id="${id}"]`).remove();
     uiUpdater.updateOddInputs();
-    uiUpdater.handleBackBetCalculation();
+    uiUpdater.handleBetsCalculate();
 };
 
 // Manual Stake Input
 export const handleManualStakeInput = (betManager, uiUpdater, event) => {
     const $input = $(event.target);
+    const editedField = $(event.target).parent().find('label').html();
     const betId = $(event.target).closest('.bet-row').data('id');
     const newStake = parseFloat($(event.target).val()) || 0;
     const bet = betManager.getBetById(betId);
 
     if (bet) {
-        bet.stake = newStake;
+        if (editedField === 'Liabilities') {
+            bet.liability = newStake;
+        } else if (editedField === "Backer's Stake") {
+            bet.backerStake = newStake;
+        } else {
+            bet.stake = newStake;
+        }
         bet.isEditManualy = true;
-        $input.val(newStake);
+        bet.editedField = bet.isLayBet ? editedField : 'stake';
     }
 
     uiUpdater.calculateTotalStake();
-    uiUpdater.handleBackBetCalculation();
+    uiUpdater.handleBetsCalculate();
 };
 
 // Betting House Input
@@ -96,21 +119,28 @@ export const handleBettingHouseInput = (betManager, event) => {
         bet.bettingHouse = bettingHouse;
     }
 };
-
-// Odd Input
-export const handleOddInput = (betManager, event) => {
+// Comission Input
+export const handleComissionInput = (betManager, event, uiUpdater) => {
+    const comission = parseFloat($(event.target).val());
     const betId = $(event.target).closest('.bet-row').data('id');
-    const odd = parseFloat($(event.target).val());
-    if (!Validation.isValidOdd(odd)) {
+    if (!Validation.isValidOdd(comission)) {
         $(event.target).addClass('is-invalid');
-        ToastManager.showError('Please enter a valid odd.');
-        return;
+        ToastManager.showError('Please enter a valid comission.');
     }
     $(event.target).removeClass('is-invalid');
     const bet = betManager.getBetById(betId);
     if (bet) {
-        bet.odd = odd;
+        bet.comission = comission / 100;
     }
+    uiUpdater.handleBetsCalculate();
+};
+// Total Stake Blur
+export const handleTotalStakeinput = (uiUpdater) => {
+    // Desmarca os radio buttons de aposta fixa
+    $('.fixed-stake-radio').prop('checked', false);
+    $('#radioTotalInvestment').prop('checked', true);
+    uiUpdater.userEditingTotalStake = true;
+    uiUpdater.handleBetsCalculate();
 };
 
 // Promo Name Input

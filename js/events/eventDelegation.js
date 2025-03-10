@@ -5,9 +5,11 @@ import {
     handleDeleteBet,
     handleManualStakeInput,
     handleBettingHouseInput,
-    handleOddInput,
     handleCpfCountInput,
     handleLayBet,
+    handleComissionInput,
+    handleComissionCheckBox,
+    handleTotalStakeinput,
 } from './eventHandlers.js';
 
 export const setupEventListeners = (
@@ -16,7 +18,7 @@ export const setupEventListeners = (
     googleSheetsService
 ) => {
     $('#addBetButton').click(() => handleAddBet(BetManager, uiUpdater));
-    $('#roundStakesCheckbox').change(() => uiUpdater.handleBackBetCalculation());
+    $('#roundStakesCheckbox').change(() => uiUpdater.handleBetsCalculate());
     $('#isFreeBet').change(() => uiUpdater.toggleFreeBetFields());
     $('#cpfCount').on('input', (event) => handleCpfCountInput(event));
     $('#saveButton').click(() => googleSheetsService.saveToGoogleSheets());
@@ -25,23 +27,26 @@ export const setupEventListeners = (
         .on('input', ".auto-calc[id^='odd']", (event) =>
             handleOddInputChange(BetManager, uiUpdater, event)
         )
-        .on('input', '.stake-input', (event) =>
+        .on('input', '.stake-input, .backerStake-input', (event) =>
             handleManualStakeInput(BetManager, uiUpdater, event)
         )
         .on('input', "[id^='bettingHouse']", (event) =>
             handleBettingHouseInput(BetManager, event)
         )
-        .on('input', "[id^='odd']", (event) =>
-            handleOddInput(BetManager, event)
+        .on('input', '.comissionInput', (event) =>
+            handleComissionInput(BetManager, event, uiUpdater)
         )
         .on('click', '.delete-bet', (event) =>
             handleDeleteBet(BetManager, uiUpdater, event)
         )
         .on('change', '.fixed-stake-radio', (event) =>
-            handleFixedStakeChange(BetManager, uiUpdater, event)
+            handleFixedStakeChange(uiUpdater, event)
         )
         .on('change', '.lay-bet-switch', (event) =>
             handleLayBet(BetManager, event, uiUpdater)
         )
-        .on('input', '#totalStake', () => uiUpdater.handleTotalStakeBlur());
+        .on('change', '#comissionCheckbox', (event) =>
+            handleComissionCheckBox(event)
+        )
+        .on('input', '#totalStake', () => handleTotalStakeinput(uiUpdater));
 };

@@ -1,6 +1,8 @@
 import Validation from '../utils/Validation.js';
 import CalculatorBackBet from '../calculations/backBets/CalculatorBackBet.js';
 import CalculatorLayBet from '../calculations/laybets/CalculatorLayBet.js';
+import BetResultGenerator from '../calculations/BetResultGenerator.js';
+import SummaryGenerator from '../calculations/SummaryGenerator.js';
 
 export default class UIUpdater {
     constructor(betManager) {
@@ -14,7 +16,7 @@ export default class UIUpdater {
         this.betManager.addBet();
         this.betManager.addBet();
         this.betManager.bets.forEach((bet) => this.addBetRow(bet));
-        this.handleBackBetCalculation();
+        this.handleBetsCalculate();
     }
 
     addBetRow(bet) {
@@ -26,7 +28,7 @@ export default class UIUpdater {
         const betRow = `
         <div class="row g-3 bet-row mb-3  border-top mt-0" data-id="${bet.id}">
             <div class="col-md-1 d-flex align-items-center">
-                <input type="radio" name="calculationBase"   style="margin-top: 34px" class="form-check-input fixed-stake-radio" data-id="${
+                <input type="radio" class="form-check-input fixed-stake-radio" name="fixedStake" data-id="${
                     bet.id
                 }">
             </div>
@@ -46,7 +48,15 @@ export default class UIUpdater {
                     bet.id
                 }" value="${bet.odd.toFixed(2)}" step="0.01">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2 d-none comissionContainer">
+                <label for="comission${bet.comission}"  id="label-comission${
+            bet.comission
+        }" class="form-label">Comissão</label>
+                <input type="number" class="form-control comissionInput" id="comission${
+                    bet.comission
+                }" value="${bet.comission.toFixed(2)}" step="0.01">
+            </div>
+            <div class="col-md-2">
                 <label for="stake${bet.id}" id="label-stake${
             bet.id
         }" class="form-label ">Stake</label>
@@ -71,7 +81,7 @@ export default class UIUpdater {
                  <label for="backerStake${
                      bet.id
                  }" class="form-label">Backer's Stake</label>
-                 <input type="number" class="form-control" id="backerStake${
+                 <input type="number" class="form-control backerStake-input" id="backerStake${
                      bet.id
                  }" value="">
              </div>
@@ -79,25 +89,38 @@ export default class UIUpdater {
         $('#betContainer').append(betRow);
     }
 
+    handleBetsCalculate() {
+        // se tiver apemas uma lay bet precisa calcular tudo como lay/back
+        const layBets = this.betManager.bets.filter((bet) => bet.isLayBet);
+
+        if (layBets.length > 0) {
+            this.handleLayBetCalculation();
+        } else {
+            this.handleBackBetCalculation();
+        }
+    }
+
     handleBackBetCalculation() {
-        const totalStake = parseFloat($('#totalStake').val()) || 120;
+        const {
+            fixedBetId,
+            isTotalInvestmentBase,
+            shouldRoundStakes,
+            totalStake,
+        } = this.fixedValue();
+
         if (!Validation.isValidStake(totalStake)) {
             this.toastManager.showError('Please enter a valid total stake.');
             return;
         }
 
-        const fixedBetId = $('.fixed-stake-radio:checked').data('id') || null;
-        const isTotalInvestmentBase = $('#radioTotalInvestment').is(':checked');
-        const shouldRoundStakes = $('#roundStakesCheckbox').is(':checked');
-
-        const results = CalculatorBackBet.calculateResults(
+        const results = CalculatorBackBet.calculate(
             this.betManager.bets,
             totalStake,
             fixedBetId,
             isTotalInvestmentBase,
             shouldRoundStakes
         );
-        this.betManager.bets.forEach((bet) => {
+        results.forEach((bet) => {
             const stakeInput = $(`#stake${bet.id}`);
             const currentInputValue = parseFloat(stakeInput.val()) || 0;
 
@@ -107,13 +130,41 @@ export default class UIUpdater {
                 bet.stake = currentInputValue;
             }
         });
-        console.log(this.betManager.bets)
-        $('#resultResume').html(results.resultsResume);
-        $('#resultContainer').html(results.resultsHTML);
-        this.calculateTotalStake();
-        this.betManager.resetAllEditStatus();
+
+        this.endcalucalate(results);
     }
 
+    handleLayBetCalculation() {
+        const bets = this.betManager.bets;
+
+        const {
+            fixedBetId,
+            isTotalInvestmentBase,
+            shouldRoundStakes,
+            totalStake,
+        } = this.fixedValue();
+
+        const results = CalculatorLayBet.calculate(
+            bets,
+            totalStake,
+            fixedBetId,
+            isTotalInvestmentBase,
+            shouldRoundStakes
+        );
+        results.forEach((bet) => {
+            if (bet.isEditManualy) {
+              this.updateManuallyEditedField(bet);
+            } else {
+              if (bet.isLayBet) {
+                $(`#backerStake${bet.id}`).val(bet.backerStake.toFixed(2));
+                $(`#liability${bet.id}`).val(bet.liability.toFixed(2));
+              } else {
+                $(`#stake${bet.id}`).val(bet.stake.toFixed(2));
+              }
+            }
+          });
+        this.endcalucalate(results);
+    }
     calculateTotalStake() {
         if (this.userEditingTotalStake) return;
         let total = 0;
@@ -126,13 +177,6 @@ export default class UIUpdater {
         return total;
     }
 
-    handleTotalStakeBlur() {
-        this.userEditingTotalStake = true;
-
-        $('#radioTotalInvestment').prop('checked', true);
-        this.handleBackBetCalculation();
-    }
-
     handleStakeInputFocus(event) {
         let betId = $(event.target).closest('.bet-row').data('id');
         this.betManager.bets.forEach((bet) => {
@@ -140,12 +184,6 @@ export default class UIUpdater {
                 bet.isEditManualy = true;
             }
         });
-    }
-
-    autoSelectTotalInvestment() {
-        if (!$('#radioTotalInvestment').is(':checked')) {
-            $('#radioTotalInvestment').prop('checked', true).trigger('change');
-        }
     }
 
     toggleFreeBetFields() {
@@ -159,12 +197,31 @@ export default class UIUpdater {
         });
     }
 
-    updateLayBetUI = (results, bet) => {
-        $(`#backerStake${bet.id}`).val(results.layBet.backerStake.toFixed(2));
-        $(`#stake${bet.id}`).val(results.layBet.stake.toFixed(2));
-    };
+    fixedValue() {
+        const fixedBetId = $('.fixed-stake-radio:checked').data('id') || null;
+        const isTotalInvestmentBase = $('#radioTotalInvestment').is(':checked');
+        const shouldRoundStakes = $('#roundStakesCheckbox').is(':checked');
+        const totalStake = parseFloat($('#totalStake').val()) || 120;
+        return {
+            fixedBetId,
+            isTotalInvestmentBase,
+            shouldRoundStakes,
+            totalStake,
+        };
+    }
 
-    updateBackBetUI = (results, bet) => {
-        $(`#stake${bet.id}`).val(results.layBet.stake.toFixed(2));
-    };
+    endcalucalate(results) {
+        BetResultGenerator.generateBetResults(results);
+        SummaryGenerator.generateSummary(results);
+        this.calculateTotalStake();
+        this.betManager.resetAllEditStatus();
+    }
+
+    updateManuallyEditedField(bet) {
+        if (bet.editedField === "Backer's Stake") {
+            $(`#liability${bet.id}`).val(bet.liability.toFixed(2));
+        } else if (bet.editedField === 'Liabilities') {
+            $(`#backerStake${bet.id}`).val(bet.backerStake.toFixed(2));
+        }
+    }
 }

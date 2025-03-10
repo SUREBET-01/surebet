@@ -22,63 +22,75 @@
                         <label for="cpfCount" class="form-label">Número de CPFs/Contas Usados</label>
                         <input type="number" class="form-control" id="cpfCount" value="1" min="1">
                     </div>
-                
+
 
                     <h3 class="mb-3">Adicionar Aposta</h3>
 
                     <!-- Total Investment -->
-                    <div class="row mb-3">
+                     
+                    <div class="row mb-5">
+                        
                         <div class="col-md-1 d-flex align-items-center">
-                            <input type="radio" name="calculationBase" class="form-check-input fixed-stake-radio" id="radioTotalInvestment" checked>
+                            <input type="radio" name="calculationBase" class="form-check-input fixed-stake-radio"
+                                id="radioTotalInvestment" checked>
                         </div>
-                        <div class="col-md-5">
-                            <label for="totalStake" class="form-label">Total Investment (Stake)</label>
-                            <input type="number" class="form-control auto-calc" id="totalStake" value="120" step="0.01">
+                        <div class="col-md-3 mb-3">
+                            <label for="totalStake" class="form-label">Investimento Total (Stake)</label>
+                            <input type="number" class="form-control" id="totalStake" name="totalStake" value="120" step="0.01">
                         </div>
-                        <div class="col-md-3" style="    margin-top: 37px;">
-                            <input class="form-check-input" type="checkbox" id="roundStakesCheckbox">
-                            <label class="form-check-label" for="roundStakesCheckbox">Arredondar</label>
-                        </div>
-                    </div>
+                        <div class="col-md-6 mt-4">
+                                <div >
+                                    <input class="form-check-input" type="checkbox" id="roundStakesCheckbox">
+                                    <label class="form-check-label" for="roundStakesCheckbox">Arredondar</label>
+                                </div> 
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="comissionCheckbox">
+                                    <label class="form-check-label" for="roundStakesCheckbox">Comissões</label>
+                                </div>
 
-                    <!-- Bet Container -->
-                    <div id="betContainer">
-                        <!-- Bet Rows will be dynamically generated -->
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="d-flex justify-content-between mb-4" style="margin-top: 50px;">
-                        <div>
-                            <button type="button" class="btn btn-primary" id="addBetButton">Adicionar Aposta</button>
                         </div>
-                        <div>
-                            <button type="button" class="btn btn-warning" id="saveButton">Salvar no Google Sheets</button>
-                        </div>
-                    </div>
 
-                    <!-- Free Bet Checkbox -->
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="isFreeBet">
-                        <label class="form-check-label" for="isFreeBet">Esta é uma Free Bet?</label>
-                    </div>
-
-                    <!-- Free Bet Fields (Hidden initially) -->
-                    <div id="freeBetFields" class="border p-3 rounded" style="display: none;">
-                        <div class="mb-3">
-                            <label for="promoName" class="form-label">Nome da Promoção</label>
-                            <input type="text" class="form-control" id="promoName" placeholder="Digite o nome da promoção">
+                        <!-- Bet Container -->
+                        <div id="betContainer">
+                            <!-- Bet Rows will be dynamically generated -->
                         </div>
-                        <div class="row g-3">
-                            <div class="col">
-                                <label for="freeBetExpiry" class="form-label">Data de Expiração</label>
-                                <input type="date" class="form-control" id="freeBetExpiry">
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between mb-4" style="margin-top: 50px;">
+                            <div>
+                                <button type="button" class="btn btn-primary" id="addBetButton">Adicionar
+                                    Aposta</button>
                             </div>
-                            <div class="col">
-                                <label for="freeBetReturn" class="form-label">Retorno Esperado</label>
-                                <input type="number" class="form-control" id="freeBetReturn" step="0.01">
+                            <div>
+                                <button type="button" class="btn btn-warning" id="saveButton">Salvar no Google
+                                    Sheets</button>
                             </div>
                         </div>
-                    </div>
+
+                        <!-- Free Bet Checkbox -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="isFreeBet">
+                            <label class="form-check-label" for="isFreeBet">Esta é uma Free Bet?</label>
+                        </div>
+
+                        <!-- Free Bet Fields (Hidden initially) -->
+                        <div id="freeBetFields" class="border p-3 rounded" style="display: none;">
+                            <div class="mb-3">
+                                <label for="promoName" class="form-label">Nome da Promoção</label>
+                                <input type="text" class="form-control" id="promoName"
+                                    placeholder="Digite o nome da promoção">
+                            </div>
+                            <div class="row g-3">
+                                <div class="col">
+                                    <label for="freeBetExpiry" class="form-label">Data de Expiração</label>
+                                    <input type="date" class="form-control" id="freeBetExpiry">
+                                </div>
+                                <div class="col">
+                                    <label for="freeBetReturn" class="form-label">Retorno Esperado</label>
+                                    <input type="number" class="form-control" id="freeBetReturn" step="0.01">
+                                </div>
+                            </div>
+                        </div>
                 </form>
             </div>
 
@@ -99,11 +111,11 @@
                                 </tr>
                             </thead>
                             <tbody id="resultContainer">
-                               
+
                             </tbody>
                         </table>
                     </div>
-                
+
                     <div class="row mt-4" id="resultResume">
 
                     </div>
@@ -112,7 +124,8 @@
         </div>
 
         <!-- Modal for Loading -->
-            <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
 
             <div class="modal-dialog d-flex justify-content-center align-items-center">
                 <div class="modal-content text-center">

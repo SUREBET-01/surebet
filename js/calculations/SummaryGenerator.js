@@ -1,11 +1,10 @@
 import { StakeCalculator } from './backBets/StakeCalculator.js';
 
-export class SummaryGenerator {
-    static generateSummary(returns, stakes, bets, avaregeProfit) {
-        const minReturn = Math.min(...returns);
-        const totalStake = StakeCalculator.sumStakes(stakes);
-        const netProfit = minReturn - totalStake;
-        const roi = (netProfit / totalStake) * 100;
+export  default class SummaryGenerator {
+    static generateSummary(bets) {
+        const totalStake = StakeCalculator.sumStakes(bets);
+        const avaregeProfit = bets.reduce((acc, bet) => acc + bet.profit, 0) / bets.length;
+        const roi = (avaregeProfit / totalStake) * 100;
 
         const resultsResume = `
             <div class="col-md-6">
@@ -25,7 +24,6 @@ export class SummaryGenerator {
                 </div>
             </div>
         `;
-
-        return { resultsResume, roi };
+        $('#resultResume').html(resultsResume);                
     }
 }
