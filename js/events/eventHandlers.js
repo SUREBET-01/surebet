@@ -98,7 +98,7 @@ export const handleManualStakeInput = (betManager, uiUpdater, event) => {
         }
         bet.isEditManualy = true;
         uiUpdater.userEditingTotalStake = false;
-        bet.editedField = bet.isLayBet ? editedField : 'stake';
+        bet.editedField = bet.isLayBet ? editedField : 'Stake';
     }
 
     uiUpdater.calculateTotalStake();
