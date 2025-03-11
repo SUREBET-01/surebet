@@ -17,8 +17,8 @@ export default class GoogleSheetsService {
             odd: bet.odd,
             stake: bet.stake,
             netReturn: bet.getNetReturn(),
-            probability: 0, // Placeholder
-            commission: 0, // Placeholder
+            probability: bet.probability, 
+            commission: bet.commission, 
             netReturnByBet: (bet.getNetReturn() - totalStake).toFixed(2),
         }));
 

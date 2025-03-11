@@ -157,7 +157,7 @@ export default class UIUpdater {
             } else {
               if (bet.isLayBet) {
                 $(`#backerStake${bet.id}`).val(bet.backerStake.toFixed(2));
-                $(`#liability${bet.id}`).val(bet.liability.toFixed(2));
+                $(`#stake${bet.id}`).val(bet.liability.toFixed(2));
               } else {
                 $(`#stake${bet.id}`).val(bet.stake.toFixed(2));
               }
@@ -165,6 +165,7 @@ export default class UIUpdater {
           });
         this.endcalucalate(results);
     }
+    
     calculateTotalStake() {
         if (this.userEditingTotalStake) return;
         let total = 0;
@@ -219,7 +220,7 @@ export default class UIUpdater {
 
     updateManuallyEditedField(bet) {
         if (bet.editedField === "Backer's Stake") {
-            $(`#liability${bet.id}`).val(bet.liability.toFixed(2));
+            $(`#stake${bet.id}`).val(bet.liability.toFixed(2));
         } else if (bet.editedField === 'Liabilities') {
             $(`#backerStake${bet.id}`).val(bet.backerStake.toFixed(2));
         }

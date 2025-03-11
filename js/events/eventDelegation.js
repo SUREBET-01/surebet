@@ -5,7 +5,6 @@ import {
     handleDeleteBet,
     handleManualStakeInput,
     handleBettingHouseInput,
-    handleCpfCountInput,
     handleLayBet,
     handleComissionInput,
     handleComissionCheckBox,
@@ -20,7 +19,6 @@ export const setupEventListeners = (
     $('#addBetButton').click(() => handleAddBet(BetManager, uiUpdater));
     $('#roundStakesCheckbox').change(() => uiUpdater.handleBetsCalculate());
     $('#isFreeBet').change(() => uiUpdater.toggleFreeBetFields());
-    $('#cpfCount').on('input', (event) => handleCpfCountInput(event));
     $('#saveButton').click(() => googleSheetsService.saveToGoogleSheets());
 
     $(document)
