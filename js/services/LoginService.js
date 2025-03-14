@@ -24,10 +24,9 @@ export default class LoginService {
 
         if (!this.validateInputs(email, password, sheetId, sheetName)) return;
         this.toggleSpinner(true);
-        
-        
+
         $.ajax({
-            url: 'https://script.google.com/macros/s/AKfycbwryZxhplBkvuvPBQF45zAvmc7MChMQMUkjUozY5feFabKPJY-aj9DrBhpgiA0djM48/exec',
+            url: 'https://script.google.com/macros/s/AKfycbyhM5bbZeEhFsbH4kf6Bt_XV8zQ2xJJc31cJelkDfpBeJm7jwMLF-MjreQTHUQ30te2/exec',
             type: 'POST',
             contentType: 'text/plain',
             data: JSON.stringify({
@@ -35,7 +34,7 @@ export default class LoginService {
                 email: email,
                 password: password,
                 sheetId: sheetId,
-                sheetName: sheetName
+                sheetName: sheetName,
             }),
             success: (response) => {
                 this.toggleSpinner(false);
@@ -44,13 +43,17 @@ export default class LoginService {
                     this.storeCredentials(email, password, sheetId, sheetName);
                     $('#loginModal').modal('hide');
                 } else {
-                    ToastManager.showError('Erro ao cadastrar usuário: ' + response.message);
+                    ToastManager.showError(
+                        'Erro ao cadastrar usuário: ' + response.message
+                    );
                 }
             },
             error: (error) => {
                 this.toggleSpinner(false);
-                ToastManager.showError('Erro ao enviar os dados: ' + error.responseText);
-            }
+                ToastManager.showError(
+                    'Erro ao enviar os dados: ' + error.responseText
+                );
+            },
         });
     }
 
@@ -58,37 +61,47 @@ export default class LoginService {
         this.toggleSpinner(true);
         const email = $('#email').val().trim() || userEmail;
         const password = $('#password').val().trim() || userPassword;
-        
+
         $.ajax({
-            url: 'https://script.google.com/macros/s/AKfycbwryZxhplBkvuvPBQF45zAvmc7MChMQMUkjUozY5feFabKPJY-aj9DrBhpgiA0djM48/exec',
+            url: 'https://script.google.com/macros/s/AKfycbyhM5bbZeEhFsbH4kf6Bt_XV8zQ2xJJc31cJelkDfpBeJm7jwMLF-MjreQTHUQ30te2/exec',
             type: 'POST',
             contentType: 'text/plain',
             data: JSON.stringify({
                 action: 'login',
                 email: email,
-                password: password
+                password: password,
             }),
             success: (response) => {
                 this.toggleSpinner(false);
-                if (!response.findEmail || response.status === 'error' ) {
+                if (!response.findEmail || response.status === 'error') {
                     if (!isAutocheck) this.showRegister();
                     $('#loginModal').modal('show');
                     this.clearLocalStorage();
                 } else if (response.status === 'success') {
                     ToastManager.showSuccess('Login bem-sucedido!');
                     $('#loginModal').modal('hide');
-                    this.storeCredentials(email, password, response.sheetId, response.sheetName);
+                    this.storeCredentials(
+                        email,
+                        password,
+                        response.sheetId,
+                        response.sheetName
+                    );
                 }
             },
             error: (error) => {
                 this.toggleSpinner(false);
                 ToastManager.showError('Erro ao fazer login: ' + error.message);
-            }
+            },
         });
     }
 
     validateInputs(email, password, sheetId, sheetName) {
-        return handleEmailInput(email) && handlePasswordInput(password) && handleGoogleIdInput(sheetId) && handleGoogleIdInput(sheetName);
+        return (
+            handleEmailInput(email) &&
+            handlePasswordInput(password) &&
+            handleGoogleIdInput(sheetId) &&
+            handleGoogleIdInput(sheetName)
+        );
     }
 
     storeCredentials(email, password, sheetId, sheetName) {

@@ -6,7 +6,7 @@ import {
     handleFreeBetExpiryInput,
     handleFreeBetReturnInput,
     handleCpfCountInput,
-    handleGoogleIdInput
+    handleGoogleIdInput,
 } from '../events/eventHandlers.js';
 export default class GoogleSheetsService {
     constructor(BetManager) {
@@ -58,11 +58,11 @@ export default class GoogleSheetsService {
 
         $('#loadingModal').modal('show');
         $.ajax({
-            url: 'https://script.google.com/macros/s/AKfycbwryZxhplBkvuvPBQF45zAvmc7MChMQMUkjUozY5feFabKPJY-aj9DrBhpgiA0djM48/exec', // Replace with your Google Script URL
+            url: 'https://script.google.com/macros/s/AKfycbyhM5bbZeEhFsbH4kf6Bt_XV8zQ2xJJc31cJelkDfpBeJm7jwMLF-MjreQTHUQ30te2/exec', // Replace with your Google Script URL
             type: 'POST',
             contentType: 'text/plain',
             data: JSON.stringify({
-                action: "salvarDados",
+                action: 'salvarDados',
                 bets: bets,
                 totalStake: totalStake,
                 netProfit: netProfit,
@@ -73,8 +73,8 @@ export default class GoogleSheetsService {
                 freeBetExpiry: freeBetExpiry,
                 freeBetReturn: freeBetReturn,
                 accoutsUsed: accoutsUsed,
-                sheetId: localStorage.getItem("sheetId"),
-                sheetName: localStorage.getItem("sheetName")
+                sheetId: localStorage.getItem('sheetId'),
+                sheetName: localStorage.getItem('sheetName'),
             }),
             success: (response) => {
                 $('#loadingModal').modal('hide');
@@ -103,7 +103,7 @@ export default class GoogleSheetsService {
         const importText = $('#importText');
         const importSpinner = $('#importSpinner');
 
-        if(!handleGoogleIdInput(sheetId)) return;
+        if (!handleGoogleIdInput(sheetId)) return;
 
         // Desabilita o botão e exibe o spinner
         importButton.prop('disabled', true);
@@ -111,7 +111,7 @@ export default class GoogleSheetsService {
         importSpinner.removeClass('d-none');
 
         $.ajax({
-            url: 'https://script.google.com/macros/s/AKfycbwryZxhplBkvuvPBQF45zAvmc7MChMQMUkjUozY5feFabKPJY-aj9DrBhpgiA0djM48/exec',
+            url: 'https://script.google.com/macros/s/AKfycbyhM5bbZeEhFsbH4kf6Bt_XV8zQ2xJJc31cJelkDfpBeJm7jwMLF-MjreQTHUQ30te2/exec',
             type: 'POST',
             contentType: 'text/plain',
             data: JSON.stringify({
