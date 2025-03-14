@@ -5,6 +5,12 @@ import ToastManager from '../utils/ToastManager.js';
 export const handleAddBet = (betManager, uiUpdater) => {
     const bet = betManager.addBet();
     uiUpdater.addBetRow(bet);
+
+    const comissionContainer = $(`.comissionContainer`);
+
+    if ($('#comissionCheckbox').prop('checked')) {
+        comissionContainer.removeClass('d-none');
+    }
     uiUpdater.updateOddInputs();
     uiUpdater.handleBetsCalculate();
 };
@@ -44,17 +50,19 @@ export const handleLayBet = (betManager, event, uiUpdater) => {
     const bet = betManager.getBetById(betId);
 
     bet.isLayBet = $(event.target).prop('checked');
-
+    bet.liability = bet.stake;
     const backerStakeContainer = $(`#backerStakeContainer${betId}`);
 
     if ($(event.target).prop('checked')) {
         $(`#label-stake${betId}`).text('Liabilities');
         $(`#label-odd${betId}`).text('Lay Odds');
-        backerStakeContainer.removeClass('d-none');
+        backerStakeContainer.removeClass('d-none');       
+        $('.backerStakeContainer').removeClass('offset-md-7').addClass('offset-md-5');
     } else {
         $(`#label-stake${betId}`).text('Stake');
         $(`#label-odd${betId}`).text('Odds');
         backerStakeContainer.addClass('d-none');
+        $('.backerStakeContainer').removeClass('offset-md-5').addClass('offset-md-7');
     }
 
     uiUpdater.handleLayBetCalculation(betManager.bets);
@@ -66,8 +74,10 @@ export const handleComissionCheckBox = (event) => {
 
     if ($(event.target).prop('checked')) {
         comissionContainer.removeClass('d-none');
+        $('.backerStakeContainer').removeClass('offset-md-5').addClass('offset-md-7');
     } else {
         comissionContainer.addClass('d-none');
+        $('.backerStakeContainer').removeClass('offset-md-7').addClass('offset-md-5');
     }
 };
 
@@ -122,16 +132,16 @@ export const handleBettingHouseInput = (betManager, event) => {
 };
 // Comission Input
 export const handleComissionInput = (betManager, event, uiUpdater) => {
-    const comission = parseFloat($(event.target).val());
+    const commission = parseFloat($(event.target).val());
     const betId = $(event.target).closest('.bet-row').data('id');
-    if (!Validation.isValidOdd(comission)) {
+    if (!Validation.isValidOdd(commission)) {
         $(event.target).addClass('is-invalid');
-        ToastManager.showError('Please enter a valid comission.');
+        ToastManager.showError('Please enter a valid commission.');
     }
     $(event.target).removeClass('is-invalid');
     const bet = betManager.getBetById(betId);
     if (bet) {
-        bet.comission = comission / 100;
+        bet.commission = commission / 100;
     }
     uiUpdater.handleBetsCalculate();
 };

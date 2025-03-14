@@ -54,12 +54,12 @@ export default class CalculatorBackBet {
 
     /**
      * Ajusta a odd de cada aposta considerando a comissão.
-     * Fórmula: odd = odd - (odd - 1) * comission
+     * Fórmula: odd = odd - (odd - 1) * commission
      * @param {Array} bets
      */
     static adjustOdds(bets) {
         bets.forEach((bet) => {
-            bet.odd = bet.odd - (bet.odd - 1) * bet.comission;
+            bet.odd = bet.odd - (bet.odd - 1) * bet.commission;
         });
     }
 

@@ -21,7 +21,8 @@ export class StandardStakeAllocator {
                     // Para aposta fixa do tipo lay:
                     fixedValue = bet.liability;
                     // O retorno efetivo é o backer’s stake convertido em ganho, considerando a comissão
-                    fixedReturn = (bet.liability / (bet.odd - 1)) * (1 - bet.comission);
+                    fixedReturn =
+                        (bet.liability / (bet.odd - 1)) * (1 - bet.commission);
                 } else {
                     fixedValue = bet.stake;
                     fixedReturn = fixedValue * adjustedOdd;
@@ -58,7 +59,7 @@ export class StandardStakeAllocator {
                         backerStake = fixedReturn / adjustedOdd;
                         liability = backerStake * (bet.odd - 1);
                     } else {
-                        stakeValue = remainingStake; // ou outra lógica conforme seu cenário
+                        stakeValue = remainingStake;
                     }
                 } else {
                     if (bet.isLayBet) {

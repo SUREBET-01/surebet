@@ -25,7 +25,6 @@ export default class UIUpdater {
             bet.id > 2
                 ? `<div class="col-md-1"><button type="button" class="btn btn-danger delete-bet" data-id="${bet.id}" style="margin-top: 30px"><i class="fas fa-trash"></i></button></div>`
                 : '';
-
         const betRow = `
         <div class="row g-3 bet-row mb-3  border-top mt-0" data-id="${bet.id}">
             <div class="col-md-1 d-flex align-items-center">
@@ -33,7 +32,7 @@ export default class UIUpdater {
                     bet.id
                 }">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label for="bettingHouse${
                     bet.id
                 }" class="form-label">Betting House</label>
@@ -50,12 +49,12 @@ export default class UIUpdater {
                 }" value="${bet.odd.toFixed(2)}" step="0.01">
             </div>
             <div class="col-md-2 d-none comissionContainer">
-                <label for="comission${bet.comission}"  id="label-comission${
-            bet.comission
+                <label for="commission${bet.commission}"  id="label-commission${
+            bet.commission
         }" class="form-label">Comissão</label>
-                <input type="number" class="form-control comissionInput" id="comission${
-                    bet.comission
-                }" value="${bet.comission.toFixed(2)}" step="0.01">
+                <input type="number" class="form-control comissionInput" id="commission${
+                    bet.commission
+                }" value="${bet.commission.toFixed(2)}" step="0.01">
             </div>
             <div class="col-md-2">
                 <label for="stake${bet.id}" id="label-stake${
@@ -76,7 +75,7 @@ export default class UIUpdater {
                 </div>
             </div>    
             ${deleteButton}
-             <div class="col-md-3 offset-md-6 d-none" id="backerStakeContainer${
+             <div class="col-md-2 backerStakeContainer  d-none" id="backerStakeContainer${
                  bet.id
              }">
                  <label for="backerStake${
@@ -154,19 +153,19 @@ export default class UIUpdater {
         );
         results.forEach((bet) => {
             if (bet.isEditManualy) {
-              this.updateManuallyEditedField(bet);
+                this.updateManuallyEditedField(bet);
             } else {
-              if (bet.isLayBet) {
-                $(`#backerStake${bet.id}`).val(bet.backerStake.toFixed(2));
-                $(`#stake${bet.id}`).val(bet.liability.toFixed(2));
-              } else {
-                $(`#stake${bet.id}`).val(bet.stake.toFixed(2));
-              }
+                if (bet.isLayBet) {
+                    $(`#backerStake${bet.id}`).val(bet.backerStake.toFixed(2));
+                    $(`#stake${bet.id}`).val(bet.liability.toFixed(2));
+                } else {
+                    $(`#stake${bet.id}`).val(bet.stake.toFixed(2));
+                }
             }
-          });
+        });
         this.endcalucalate(results);
     }
-    
+
     calculateTotalStake() {
         if (this.userEditingTotalStake) return;
         let total = 0;

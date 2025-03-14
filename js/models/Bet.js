@@ -1,15 +1,15 @@
 export default class Bet {
     constructor(
-        id, 
-        bettingHouse = '', 
-        odd = 1.0, 
-        stake = 0, 
-        isLayBet = false, 
-        backerStake = 0, 
-        liability = 0, 
+        id,
+        bettingHouse = '',
+        odd = 1.0,
+        stake = 0,
+        isLayBet = false,
+        backerStake = 0,
+        liability = 0,
         isEditManualy = false,
         profit = 0,
-        comission = 0,
+        commission = 0,
         probability = 0,
         editedField = ''
     ) {
@@ -22,7 +22,7 @@ export default class Bet {
         this.liability = liability;
         this.isEditManualy = isEditManualy;
         this.profit = profit;
-        this.comission = comission;
+        this.commission = commission;
         this.probability = probability;
         this.editedField = editedField;
     }
