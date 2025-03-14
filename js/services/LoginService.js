@@ -34,7 +34,8 @@ export default class LoginService {
                 action: 'cadastro',
                 email: email,
                 password: password,
-                sheetId: sheetId
+                sheetId: sheetId,
+                sheetName: sheetName
             }),
             success: (response) => {
                 this.toggleSpinner(false);
