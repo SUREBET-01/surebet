@@ -4,8 +4,6 @@ import {
     handlePasswordInput,
     handleGoogleIdInput,
 } from '../events/eventHandlers.js';
-import Validation from '../utils/Validation.js';
-
 export default class LoginService {
     checkLogin() {
         const userEmail = localStorage.getItem('userEmail');
@@ -19,21 +17,15 @@ export default class LoginService {
     }
 
     submitLogin() {
-
-        const email = $('#email').val();
-        const password = $('#password').val();
-        const sheetId = $('#sheetId').val();
+        const email = $('#email').val().trim();
+        const password = $('#password').val().trim();
+        const sheetId = $('#sheetId').val().trim();
         const sheetName = $('#sheetSelector').val();
 
-        if (
-            !handleEmailInput(email) ||
-            !handlePasswordInput(password) ||
-            !handleGoogleIdInput(sheetId) ||
-            !handleGoogleIdInput(sheetName)
-        )
-            return;
-            this.showSpinner();
-
+        if (!this.validateInputs(email, password, sheetId, sheetName)) return;
+        this.toggleSpinner(true);
+        
+        
         $.ajax({
             url: 'https://script.google.com/macros/s/AKfycbwryZxhplBkvuvPBQF45zAvmc7MChMQMUkjUozY5feFabKPJY-aj9DrBhpgiA0djM48/exec',
             type: 'POST',
@@ -42,40 +34,30 @@ export default class LoginService {
                 action: 'cadastro',
                 email: email,
                 password: password,
-                sheetId: sheetId,
+                sheetId: sheetId
             }),
             success: (response) => {
+                this.toggleSpinner(false);
                 if (response.status === 'success') {
-                    ToastManager.showSuccess('Cadastrado com successo! ');
-                    localStorage.setItem('userEmail', email);
-                    localStorage.setItem('userPassword', password);
-                    localStorage.setItem('sheetId', sheetId);
-                    localStorage.setItem('sheetName', sheetName);
+                    ToastManager.showSuccess('Cadastrado com sucesso!');
+                    this.storeCredentials(email, password, sheetId, sheetName);
                     $('#loginModal').modal('hide');
                 } else {
-                    ToastManager.showError(
-                        'Erro ao cadastrar usuário: ' + response.message
-                    );
+                    ToastManager.showError('Erro ao cadastrar usuário: ' + response.message);
                 }
-                this.hideSpinner();
             },
             error: (error) => {
-                ToastManager.showError(
-                    'Erro ao enviar os dados: ' + error.responseText
-                );
-                this.hideSpinner();
-            },
+                this.toggleSpinner(false);
+                ToastManager.showError('Erro ao enviar os dados: ' + error.responseText);
+            }
         });
     }
+
     loginUsuario(userEmail, userPassword, isAutocheck = false) {
-        this.showSpinner();
+        this.toggleSpinner(true);
         const email = $('#email').val().trim() || userEmail;
-        const password = $('#password').val() || userPassword;
-        const isValidemail = handleEmailInput(email);
-        const isValidPassword = handlePasswordInput(password);
-
-        if (!isValidemail || !isValidPassword) return;
-
+        const password = $('#password').val().trim() || userPassword;
+        
         $.ajax({
             url: 'https://script.google.com/macros/s/AKfycbwryZxhplBkvuvPBQF45zAvmc7MChMQMUkjUozY5feFabKPJY-aj9DrBhpgiA0djM48/exec',
             type: 'POST',
@@ -83,57 +65,53 @@ export default class LoginService {
             data: JSON.stringify({
                 action: 'login',
                 email: email,
-                password: password,
+                password: password
             }),
             success: (response) => {
-                if (!response.findEmail) {
-                    if (!isAutocheck) {
-                        this.showRegister();
-                    }
-                    this.hideSpinner();
+                this.toggleSpinner(false);
+                if (!response.findEmail || response.status === 'error' ) {
+                    if (!isAutocheck) this.showRegister();
                     $('#loginModal').modal('show');
-                    localStorage.setItem('userEmail', '');
-                    localStorage.setItem('userPassword', '');
-                    localStorage.setItem('sheetId', '');
-                }
-                if (response.status === 'success') {
+                    this.clearLocalStorage();
+                } else if (response.status === 'success') {
                     ToastManager.showSuccess('Login bem-sucedido!');
                     $('#loginModal').modal('hide');
-                    localStorage.setItem('userEmail', email);
-                    localStorage.setItem('userPassword', password);
-                    localStorage.setItem('sheetId', response.sheetId);
+                    this.storeCredentials(email, password, response.sheetId, response.sheetName);
                 }
             },
             error: (error) => {
+                this.toggleSpinner(false);
                 ToastManager.showError('Erro ao fazer login: ' + error.message);
-                this.hideSpinner();
-            },
+            }
         });
     }
 
-    showSpinner() {
-        $('#loginText').addClass('d-none');
-        $('.spinner').removeClass('d-none');
-        $('#login').prop('disabled', true);
-        $('#register').prop('disabled', true);
+    validateInputs(email, password, sheetId, sheetName) {
+        return handleEmailInput(email) && handlePasswordInput(password) && handleGoogleIdInput(sheetId) && handleGoogleIdInput(sheetName);
     }
 
-    hideSpinner() {
-        $('#loginText').removeClass('d-none');
-        $('.spinner').addClass('d-none');
-        $('#login').prop('disabled', false);
-        $('#register').prop('disabled', false);
+    storeCredentials(email, password, sheetId, sheetName) {
+        localStorage.setItem('userEmail', email);
+        localStorage.setItem('userPassword', password);
+        localStorage.setItem('sheetId', sheetId);
+        localStorage.setItem('sheetName', sheetName);
+    }
+
+    clearLocalStorage() {
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userPassword');
+        localStorage.removeItem('sheetId');
+        localStorage.removeItem('sheetName');
+    }
+    toggleSpinner(isLoading) {
+        $('#loginText').toggleClass('d-none', isLoading);
+        $('.spinner').toggleClass('d-none', !isLoading);
+        $('#login, #register').prop('disabled', isLoading);
     }
 
     showRegister() {
         $('#login').addClass('d-none');
-        $('#register').removeClass('d-none');
+        $('#register').removeClass('d-none').prop('disabled', true);
         $('#sheetIdContainer').removeClass('d-none');
-        $('#register').prop('disabled', true);
-    }
-
-    hideRegister() {
-        $('#login').removeClass('d-none');
-        $('#register').addClass('d-none');
     }
 }
