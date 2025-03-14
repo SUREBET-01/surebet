@@ -75,4 +75,14 @@ export default class BetManager {
             bet.stake = results.backBet.stake;
         }
     }
+    static calculateBackGrossProfit(bets) {
+        return bets.stake * (bets.odd - (bets.odd - 1) * bets.commission);
+    }
+    static calculateLayGrossProfit(bets) {
+        return (
+            bets.backerStake +
+            bets.liability -
+            bets.backerStake * bets.commission
+        );
+    }
 }

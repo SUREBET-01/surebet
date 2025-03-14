@@ -1,6 +1,5 @@
 import Validation from '../utils/Validation.js';
 import ToastManager from '../utils/ToastManager.js';
-
 // Add Bet
 export const handleAddBet = (betManager, uiUpdater) => {
     const bet = betManager.addBet();
@@ -56,13 +55,17 @@ export const handleLayBet = (betManager, event, uiUpdater) => {
     if ($(event.target).prop('checked')) {
         $(`#label-stake${betId}`).text('Liabilities');
         $(`#label-odd${betId}`).text('Lay Odds');
-        backerStakeContainer.removeClass('d-none');       
-        $('.backerStakeContainer').removeClass('offset-md-7').addClass('offset-md-5');
+        backerStakeContainer.removeClass('d-none');
+        $('.backerStakeContainer')
+            .removeClass('offset-md-7')
+            .addClass('offset-md-5');
     } else {
         $(`#label-stake${betId}`).text('Stake');
         $(`#label-odd${betId}`).text('Odds');
         backerStakeContainer.addClass('d-none');
-        $('.backerStakeContainer').removeClass('offset-md-5').addClass('offset-md-7');
+        $('.backerStakeContainer')
+            .removeClass('offset-md-5')
+            .addClass('offset-md-7');
     }
 
     uiUpdater.handleLayBetCalculation(betManager.bets);
@@ -74,10 +77,14 @@ export const handleComissionCheckBox = (event) => {
 
     if ($(event.target).prop('checked')) {
         comissionContainer.removeClass('d-none');
-        $('.backerStakeContainer').removeClass('offset-md-5').addClass('offset-md-7');
+        $('.backerStakeContainer')
+            .removeClass('offset-md-5')
+            .addClass('offset-md-7');
     } else {
         comissionContainer.addClass('d-none');
-        $('.backerStakeContainer').removeClass('offset-md-7').addClass('offset-md-5');
+        $('.backerStakeContainer')
+            .removeClass('offset-md-7')
+            .addClass('offset-md-5');
     }
 };
 
@@ -130,6 +137,7 @@ export const handleBettingHouseInput = (betManager, event) => {
         bet.bettingHouse = bettingHouse;
     }
 };
+
 // Comission Input
 export const handleComissionInput = (betManager, event, uiUpdater) => {
     const commission = parseFloat($(event.target).val());
@@ -195,14 +203,60 @@ export const handleFreeBetReturnInput = () => {
 };
 
 // CPF Count Input
-export const handleCpfCountInput = (event) => {
-    const cpfCount = parseInt($(event.target).val());
+export const handleCpfCountInput = () => {
+    const cpfCount = parseInt($('#cpfCount').val());
     if (!Validation.isValidCpfCount(cpfCount)) {
-        $(event.target).addClass('is-invalid');
+        $('#cpfCount').addClass('is-invalid');
         ToastManager.showError(
             'Por favor, insira um número válido de CPFs/Contas.'
         );
-        return;
+        return false;
     }
-    $(event.target).removeClass('is-invalid');
+    $('#cpfCount').removeClass('is-invalid');
+    return true;
+};
+// Email Input
+export const handleEmailInput = (email) => {
+    if (!Validation.isValidEmail(email)) {
+        $('#email').addClass('is-invalid');
+        ToastManager.showError('Please enter a valid email address.');
+        return false;
+    }
+    $('#email').removeClass('is-invalid');
+    return true;
+};
+
+// Password Input
+export const handlePasswordInput = (password) => {
+    if (!Validation.isValidPassword(password)) {
+        $('#password').addClass('is-invalid');
+        ToastManager.showError('Please enter a valid password.');
+        return false;
+    }
+    $('#password').removeClass('is-invalid');
+    return true;
+};
+
+// Google ID Input
+export const handleGoogleIdInput = (googleId) => {
+    if (!Validation.isValidGoogleId(googleId)) {
+        $('#sheetId').addClass('is-invalid');
+        ToastManager.showError('Please enter a valid Google ID.');
+        return false;
+    }
+    $('#sheetId').removeClass('is-invalid');
+    return true;
+};
+
+export const handleSheetsChange = (event) => {
+    const selectedSheet = $(event.target).val();
+    const registerButton = $('#register');
+
+    if (selectedSheet) {
+        registerButton.removeClass('d-none'); // Exibe o botão de cadastro
+        registerButton.prop('disabled', false); // Habilita o botão
+    } else {
+        registerButton.addClass('d-none'); // Esconde o botão se nenhuma planilha for selecionada
+        registerButton.prop('disabled', true); // Desabilita o botão
+    }
 };

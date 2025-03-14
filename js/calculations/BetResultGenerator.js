@@ -1,18 +1,17 @@
+import BetManager from "../models/BetManager.js";
+
 export default class BetResultGenerator {
     static generateBetResults(bets) {
         let resultsHTML = '';
 
         bets.forEach((bet) => {
             const grossProfit = bet.isLayBet
-                ? bet.backerStake + bet.liability
-                : bet.stake * bet.odd;
+                ? BetManager.calculateLayGrossProfit(bet)
+                : BetManager.calculateBackGrossProfit(bet);
+
             const betStake = bet.isLayBet ? bet.backerStake : bet.stake;
-            let profitClass = '';
-            if (bet.profit < 0) {
-                profitClass = 'text-danger';
-            } else if (bet.profit > 0) {
-                profitClass = 'text-success';
-            }
+
+            let profitClass = this.checkNegativeValue(bet);
 
             resultsHTML += `
                 <tr>
@@ -26,5 +25,15 @@ export default class BetResultGenerator {
             `;
         });
         $('#resultContainer').html(resultsHTML);
+    }
+
+   static checkNegativeValue(bet) {
+        if (bet.profit < 0) {
+            return 'text-danger';
+        } else if (bet.profit > 0) {
+            return 'text-success';
+        }
+
+        return '';
     }
 }

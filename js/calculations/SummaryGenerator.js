@@ -1,18 +1,24 @@
-import { StakeCalculator } from './backBets/StakeCalculator.js';
-
-export  default class SummaryGenerator {
+export default class SummaryGenerator {
     static generateSummary(bets) {
-        const totalStake = StakeCalculator.sumStakes(bets);
-        const avaregeProfit = bets.reduce((acc, bet) => acc + bet.profit, 0) / bets.length;
-        const roi = (avaregeProfit / totalStake) * 100;
+        const totalProfit = bets.reduce((acc, bet) => acc + bet.profit, 0);
+
+        const totalStake = bets.reduce(
+            (acc, bet) => acc + (bet.isLayBet ? bet.liability : bet.stake),
+            0
+        );
+
+        const averageProfit = bets.length > 0 ? totalProfit / bets.length : 0;
+
+        const roi =
+            totalStake > 0 ? (totalProfit / bets.length / totalStake) * 100 : 0;
 
         const resultsResume = `
             <div class="col-md-6">
                 <div class="alert alert-success text-center">
                     <strong>Lucro Total:</strong> R$
-                        <label id="avaregeProfit"> ${(
-                            avaregeProfit / bets.length
-                        ).toFixed(2)}</label>
+                        <label id="avaregeProfit"> ${averageProfit.toFixed(
+                            2
+                        )}</label>
                 </div>
             </div>
             <div class="col-md-6">
@@ -24,6 +30,6 @@ export  default class SummaryGenerator {
                 </div>
             </div>
         `;
-        $('#resultResume').html(resultsResume);                
+        $('#resultResume').html(resultsResume);
     }
 }

@@ -9,17 +9,23 @@ import {
     handleComissionInput,
     handleComissionCheckBox,
     handleTotalStakeinput,
+    handleSheetsChange,
 } from './eventHandlers.js';
 
 export const setupEventListeners = (
     BetManager,
     uiUpdater,
-    googleSheetsService
+    googleSheetsService,
+    loginService
 ) => {
     $('#addBetButton').click(() => handleAddBet(BetManager, uiUpdater));
     $('#roundStakesCheckbox').change(() => uiUpdater.handleBetsCalculate());
     $('#isFreeBet').change(() => uiUpdater.toggleFreeBetFields());
     $('#saveButton').click(() => googleSheetsService.saveToGoogleSheets());
+    $('#login').click(() => loginService.loginUsuario());
+    $('#register').click(() => loginService.submitLogin());
+    $('#importSheets').click(() => googleSheetsService.verifyTable());
+    $('#sheetSelector').change((event) => handleSheetsChange(event));
 
     $(document)
         .on('input', ".auto-calc[id^='odd']", (event) =>

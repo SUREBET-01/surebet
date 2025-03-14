@@ -108,7 +108,6 @@ export class StandardStakeAllocator {
             layBet.backerStake = S_lay;
             layBet.liability = (layOdd - 1) * S_lay;
         });
-        console.log(bets);
         return bets;
     }
 
