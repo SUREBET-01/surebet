@@ -5,11 +5,12 @@ import BetResultGenerator from '../calculations/BetResultGenerator.js';
 import SummaryGenerator from '../calculations/SummaryGenerator.js';
 
 export default class UIUpdater {
-    constructor(betManager, calculatorLayBet = new CalculatorLayBet()) {
+    constructor(betManager, calculatorLayBet = new CalculatorLayBet(), calculatorBackBet = new CalculatorBackBet()) {
         this.betManager = betManager;
         this.userEditingTotalStake = false;
         this.userEditingStake = false;
         this.calculatorLayBet = calculatorLayBet;
+        this.calculatorBackBet =  calculatorBackBet
     }
 
     initializeDefaultBets() {
@@ -113,7 +114,7 @@ export default class UIUpdater {
             return;
         }
 
-        const results = CalculatorBackBet.calculate(
+        const results = this.calculatorBackBet.calculate(
             this.betManager.bets,
             totalStake,
             fixedBetId,

@@ -140,7 +140,8 @@ export const handleBettingHouseInput = (betManager, event) => {
 
 // Comission Input
 export const handleComissionInput = (betManager, event, uiUpdater) => {
-    const commission = parseFloat($(event.target).val());
+    const commission = parseFloat($(event.target).val()) || 0;
+
     const betId = $(event.target).closest('.bet-row').data('id');
     if (!Validation.isValidOdd(commission)) {
         $(event.target).addClass('is-invalid');
@@ -240,11 +241,11 @@ export const handlePasswordInput = (password) => {
 // Google ID Input
 export const handleGoogleIdInput = (googleId) => {
     if (!Validation.isValidGoogleId(googleId)) {
-        $('#sheetId').addClass('is-invalid');
+        $('#sheetUrl').addClass('is-invalid');
         ToastManager.showError('Please enter a valid Google ID.');
         return false;
     }
-    $('#sheetId').removeClass('is-invalid');
+    $('#sheetUrl').removeClass('is-invalid');
     return true;
 };
 
@@ -253,10 +254,10 @@ export const handleSheetsChange = (event) => {
     const registerButton = $('#register');
 
     if (selectedSheet) {
-        registerButton.removeClass('d-none'); // Exibe o botão de cadastro
-        registerButton.prop('disabled', false); // Habilita o botão
+        registerButton.removeClass('d-none');
+        registerButton.prop('disabled', false);
     } else {
-        registerButton.addClass('d-none'); // Esconde o botão se nenhuma planilha for selecionada
-        registerButton.prop('disabled', true); // Desabilita o botão
+        registerButton.addClass('d-none');
+        registerButton.prop('disabled', true);
     }
 };

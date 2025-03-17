@@ -4,6 +4,7 @@ import {
     handlePasswordInput,
     handleGoogleIdInput,
 } from '../events/eventHandlers.js';
+import Utils from '../utils/utils.js';
 export default class LoginService {
     checkLogin() {
         const userEmail = localStorage.getItem('userEmail');
@@ -19,11 +20,13 @@ export default class LoginService {
     submitLogin() {
         const email = $('#email').val().trim();
         const password = $('#password').val().trim();
-        const sheetId = $('#sheetId').val().trim();
+        const sheetUrl = $('#sheetUrl').val().trim();
         const sheetName = $('#sheetSelector').val();
 
-        if (!this.validateInputs(email, password, sheetId, sheetName)) return;
+        if (!this.validateInputs(email, password, sheetUrl, sheetName)) return;
         this.toggleSpinner(true);
+
+        const sheetId = Utils.getSheetId(sheetUrl);
 
         $.ajax({
             url: 'https://script.google.com/macros/s/AKfycbyhM5bbZeEhFsbH4kf6Bt_XV8zQ2xJJc31cJelkDfpBeJm7jwMLF-MjreQTHUQ30te2/exec',
@@ -74,7 +77,11 @@ export default class LoginService {
             success: (response) => {
                 this.toggleSpinner(false);
                 if (!response.findEmail || response.status === 'error') {
-                    if (!isAutocheck) this.showRegister();
+                    if (this.wrongPassword(response.wrongPassword)) return;
+                    if (!isAutocheck) {
+                        this.showRegister();
+                    }
+
                     $('#loginModal').modal('show');
                     this.clearLocalStorage();
                 } else if (response.status === 'success') {
@@ -127,5 +134,16 @@ export default class LoginService {
         $('#login').addClass('d-none');
         $('#register').removeClass('d-none').prop('disabled', true);
         $('#sheetIdContainer').removeClass('d-none');
+    }
+
+    wrongPassword(wrongPassword) {
+        if (wrongPassword) {
+            $('#password').addClass('is-invalid');
+            ToastManager.showError('Please enter a valid password.');
+            return true;
+        } else {
+            $('#password').removeClass('is-invalid');
+            return false;
+        }
     }
 }

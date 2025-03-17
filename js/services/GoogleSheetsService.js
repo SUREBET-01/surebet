@@ -1,6 +1,7 @@
 import Validation from '../utils/Validation.js';
 import ToastManager from '../utils/ToastManager.js';
 import BetManager from '../models/BetManager.js';
+import Utils from '../utils/utils.js';
 import {
     handlePromoNameInput,
     handleFreeBetExpiryInput,
@@ -98,12 +99,14 @@ export default class GoogleSheetsService {
         });
     }
     verifyTable() {
-        const sheetId = $('#sheetId').val();
+        const sheetUrl = $('#sheetUrl').val();
         const importButton = $('#importSheets');
         const importText = $('#importText');
         const importSpinner = $('#importSpinner');
 
-        if (!handleGoogleIdInput(sheetId)) return;
+        if (!handleGoogleIdInput(sheetUrl)) return;
+
+        const sheetId = Utils.getSheetId(sheetUrl);
 
         // Desabilita o botão e exibe o spinner
         importButton.prop('disabled', true);
@@ -134,7 +137,6 @@ export default class GoogleSheetsService {
                 ToastManager.showError('Erro ao importar: ' + error.message);
             },
             complete: () => {
-                // Reabilita o botão e esconde o spinner após a requisição
                 importButton.prop('disabled', false);
                 importText.removeClass('d-none');
                 importSpinner.addClass('d-none');
@@ -153,4 +155,6 @@ export default class GoogleSheetsService {
 
         $('#sheetSelectorContainer').removeClass('d-none');
     }
+
+
 }
