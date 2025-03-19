@@ -86,11 +86,12 @@ export const handleLayBet = (betManager, uiUpdater, event) => {
     $(`#label-odd${betId}`).text(bet.isLayBet ? 'Lay Odds' : 'Odds');
 
     backerStakeContainer.toggleClass('d-none', !bet.isLayBet);
-    const commissionChecked = $('#comissionCheckbox').prop('checked');
+    const commissionChecked = $("#comissionCheckbox").prop('checked')
 
     $('.backerStakeContainer')
-        .toggleClass('offset-md-5', bet.isLayBet && !commissionChecked)
-        .toggleClass('offset-md-7', bet.isLayBet && commissionChecked);
+        .toggleClass('offset-md-5', bet.isLayBet)
+        .toggleClass('offset-md-7', !bet.isLayBet)
+        .toggleClass('offset-md-7', commissionChecked);
 
     uiUpdater.handleLayBetCalculation(betManager.bets);
 };
@@ -157,42 +158,14 @@ export const handleTotalStakeinput = (uiUpdater) => {
     uiUpdater.handleBetsCalculate();
 };
 
-export const handlePromoNameInput = () =>
-    handleValidationInput(
-        '#promoName',
-        Validation.isValidPromoName,
-        'Please enter a valid promotion name.'
-    );
-export const handleFreeBetExpiryInput = () =>
-    handleValidationInput(
-        '#freeBetExpiry',
-        Validation.isValidFreeBetExpiry,
-        'Please select a valid expiry date.'
-    );
-export const handleCpfCountInput = () =>
-    handleValidationInput(
-        '#cpfCount',
-        Validation.isValidCpfCount,
-        'Por favor, insira um número válido de CPFs/Contas.'
-    );
-export const handleFreeBetReturnInput = () =>
-    handleValidationInput(
-        '#freeBetReturn',
-        Validation.isValidFreeBetReturn,
-        'Please enter a valid expected return.'
-    );
-export const handleEmailInput = (email) =>
-    handleValidationInput(
-        '#email',
-        Validation.isValidEmail,
-        'Please enter a valid email address.'
-    );
-export const handlePasswordInput = (password) =>
-    handleValidationInput(
-        '#password',
-        Validation.isValidPassword,
-        'Please enter a valid password.'
-    );
+export const handlePromoNameInput = () => handleValidationInput('#promoName', Validation.isValidPromoName, 'Please enter a valid promotion name.');
+export const handleFreeBetExpiryInput = () => handleValidationInput('#freeBetExpiry', Validation.isValidFreeBetExpiry, 'Please select a valid expiry date.');
+export const handleCpfCountInput = () => handleValidationInput('#cpfCount', Validation.isValidCpfCount, 'Por favor, insira um número válido de CPFs/Contas.');
+export const handleFreeBetReturnInput = () => handleValidationInput('#freeBetReturn', Validation.isValidFreeBetReturn, 'Please enter a valid expected return.');
+export const handleEmailInput = (email) => handleValidationInput('#email', Validation.isValidEmail, 'Please enter a valid email address.');
+export const handlePasswordInput = (password) => handleValidationInput('#password', Validation.isValidPassword, 'Please enter a valid password.');
+
+
 
 // Sheets Change Handler
 export const handleSheetsChange = (event) => {

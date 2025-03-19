@@ -67,8 +67,6 @@ export default class GoogleSheetsService {
                 freeBetExpiry: freeBetExpiry,
                 freeBetReturn: freeBetReturn,
                 accoutsUsed: accoutsUsed,
-                sheetId: localStorage.getItem('sheetId'),
-                sheetName: localStorage.getItem('sheetName'),
             }),
             success: (response) => {
                 $('#loadingModal').modal('hide');

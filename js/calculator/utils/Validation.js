@@ -39,7 +39,7 @@ export default class Validation {
         );
     }
     static isValidCpfCount(cpfCount) {
-        return typeof cpfCount === 'number' && !isNaN(cpfCount) && cpfCount > 0;
+        return typeof parseFloat(cpfCount) === 'number' && !isNaN(cpfCount) && cpfCount > 0;
     }
 
     // Email Validation

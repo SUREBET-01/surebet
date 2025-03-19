@@ -16,7 +16,7 @@ export default class LoginService {
     }
 
     loginUsuario(userEmail, userPassword, isAutocheck = false) {
-        const email = $('#email').val()|| userEmail;
+        const email = $('#email').val() || userEmail;
         const password = $('#password').val() || userPassword;
         const userId = Date.now();
         if (!isAutocheck) {
@@ -36,9 +36,9 @@ export default class LoginService {
             success: (response) => {
                 this.toggleSpinner(false);
                 if (!response.findEmail || response.status === 'error') {
-                    if (this.wrongPassword(response.wrongPassword)) return;
-                    if (!isAutocheck) {
-                        this.showRegister();
+                    if (this.wrongPassword(response.wrongPassword)) {
+                        $('#loginModal').modal('show');
+                        return;
                     }
 
                     $('#loginModal').modal('show');
@@ -46,7 +46,12 @@ export default class LoginService {
                 } else if (response.status === 'success') {
                     ToastManager.showSuccess('Login bem-sucedido!');
                     $('#loginModal').modal('hide');
-                    this.storeCredentials(email, password, userId);
+                    this.storeCredentials(
+                        response.email,
+                        password,
+                        response.userId
+                    );
+                    console.log(response);
                 }
             },
             error: (error) => {
@@ -75,12 +80,6 @@ export default class LoginService {
         $('#loginText').toggleClass('d-none', isLoading);
         $('.spinner').toggleClass('d-none', !isLoading);
         $('#login, #register').prop('disabled', isLoading);
-    }
-
-    showRegister() {
-        $('#login').addClass('d-none');
-        $('#register').removeClass('d-none').prop('disabled', true);
-        $('#sheetIdContainer').removeClass('d-none');
     }
 
     wrongPassword(wrongPassword) {
