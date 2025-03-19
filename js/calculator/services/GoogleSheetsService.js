@@ -7,7 +7,6 @@ import {
     handleFreeBetExpiryInput,
     handleFreeBetReturnInput,
     handleCpfCountInput,
-    handleGoogleIdInput,
 } from '../events/eventHandlers.js';
 export default class GoogleSheetsService {
     constructor(BetManager) {
@@ -36,6 +35,7 @@ export default class GoogleSheetsService {
         const netProfit = parseFloat($('#avaregeProfit').text());
         const roi = parseFloat($('#roi').text());
         const surebetId = Date.now();
+        const userId = localStorage.getItem('userId');
 
         if (!Validation.isValidTotalStake(totalStake)) {
             ToastManager.showError(
@@ -43,19 +43,11 @@ export default class GoogleSheetsService {
             );
             return;
         }
+        if (!this.validateFreeBetInputs()) return;
 
-        const isPromoNameValid = handlePromoNameInput();
-        const isFreeBetExpiryValid = handleFreeBetExpiryInput();
-        const isFreeBetReturnValid = handleFreeBetReturnInput();
-        const iscpfInput = handleCpfCountInput();
+        const isCpfInputValid = handleCpfCountInput();
 
-        if (
-            !isPromoNameValid ||
-            !isFreeBetExpiryValid ||
-            !isFreeBetReturnValid ||
-            !iscpfInput
-        )
-            return;
+        if (!this.validateFreeBetInputs() || !isCpfInputValid) return;
 
         $('#loadingModal').modal('show');
         $.ajax({
@@ -64,6 +56,7 @@ export default class GoogleSheetsService {
             contentType: 'text/plain',
             data: JSON.stringify({
                 action: 'salvarDados',
+                userId: userId,
                 bets: bets,
                 totalStake: totalStake,
                 netProfit: netProfit,
@@ -98,63 +91,14 @@ export default class GoogleSheetsService {
             },
         });
     }
-    verifyTable() {
-        const sheetUrl = $('#sheetUrl').val();
-        const importButton = $('#importSheets');
-        const importText = $('#importText');
-        const importSpinner = $('#importSpinner');
 
-        if (!handleGoogleIdInput(sheetUrl)) return;
-
-        const sheetId = Utils.getSheetId(sheetUrl);
-
-        // Desabilita o botão e exibe o spinner
-        importButton.prop('disabled', true);
-        importText.addClass('d-none');
-        importSpinner.removeClass('d-none');
-
-        $.ajax({
-            url: 'https://script.google.com/macros/s/AKfycbyhM5bbZeEhFsbH4kf6Bt_XV8zQ2xJJc31cJelkDfpBeJm7jwMLF-MjreQTHUQ30te2/exec',
-            type: 'POST',
-            contentType: 'text/plain',
-            data: JSON.stringify({
-                action: 'verifyTable',
-                sheetId: sheetId,
-            }),
-            success: (response) => {
-                if (response.status === 'success') {
-                    ToastManager.showSuccess(
-                        `${response.sheetNames.length} planilhas importadas com sucesso!`
-                    );
-                    this.shetsOption(response.sheetNames);
-                } else {
-                    ToastManager.showError(
-                        'Erro ao importar: ' + response.message
-                    );
-                }
-            },
-            error: (error) => {
-                ToastManager.showError('Erro ao importar: ' + error.message);
-            },
-            complete: () => {
-                importButton.prop('disabled', false);
-                importText.removeClass('d-none');
-                importSpinner.addClass('d-none');
-            },
-        });
-    }
-
-    shetsOption(shetsNames) {
-        const sheetSelector = $('#sheetSelector');
-        sheetSelector.empty();
-        sheetSelector.append('<option value="">Selecione...</option>');
-
-        shetsNames.forEach((sheet) => {
-            sheetSelector.append(`<option value="${sheet}">${sheet}</option>`);
-        });
-
-        $('#sheetSelectorContainer').removeClass('d-none');
-    }
-
-
+     validateFreeBetInputs = () => {
+        if (!$('#isFreeBet').is(':checked')) return true;  // Skip validation if not checked
+    
+        const isPromoNameValid = handlePromoNameInput();
+        const isFreeBetExpiryValid = handleFreeBetExpiryInput();
+        const isFreeBetReturnValid = handleFreeBetReturnInput();
+    
+        return isPromoNameValid && isFreeBetExpiryValid && isFreeBetReturnValid;
+    };
 }

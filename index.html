@@ -14,197 +14,72 @@
     <div class="container mt-4">
         <h1 class="text-center mb-4">Sure Bet Calculator</h1>
 
-        <div class="row">
-            <div class="col-md-12">
-                <form id="betForm" class="p-3 border rounded bg-light">
-                    <div class="mb-1">
-                        <label for="cpfCount" class="form-label">Número de CPFs/Contas Usados</label>
-                        <input type="number" class="form-control" id="cpfCount" value="0" min="1">
-                    </div>
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="navTabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-tab="calculator" href="#">Calculator</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-tab="bets" href="#">Bets</a>
+            </li>
+        </ul>
 
-
-                    <h3 class="mb-3">Adicionar Aposta</h3>
-
-                    <!-- Total Investment -->
-
-                    <div class="row mb-5">
-
-                        <div class="col-md-1 d-flex align-items-center">
-                            <input type="radio" name="calculationBase" class="form-check-input fixed-stake-radio"
-                                id="radioTotalInvestment" checked>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="totalStake" class="form-label">Investimento Total (Stake)</label>
-                            <input type="number" class="form-control" id="totalStake" name="totalStake" value="120"
-                                step="0.01">
-                        </div>
-                        <div class="col-md-6 mt-4">
-                            <div>
-                                <input class="form-check-input" type="checkbox" id="roundStakesCheckbox">
-                                <label class="form-check-label" for="roundStakesCheckbox">Arredondar</label>
-                            </div>
-                            <div>
-                                <input class="form-check-input" type="checkbox" id="comissionCheckbox">
-                                <label class="form-check-label" for="roundStakesCheckbox">Comissões</label>
-                            </div>
-
-                        </div>
-
-                        <!-- Bet Container -->
-                        <div id="betContainer">
-                            <!-- Bet Rows will be dynamically generated -->
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="d-flex justify-content-between mb-4" style="margin-top: 50px;">
-                            <div>
-                                <button type="button" class="btn btn-primary" id="addBetButton">Adicionar
-                                    Aposta</button>
-                            </div>
-                            <div>
-                                <button type="button" class="btn btn-warning" id="saveButton">Salvar no Google
-                                    Sheets</button>
-                            </div>
-                        </div>
-
-                        <!-- Free Bet Checkbox -->
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="isFreeBet">
-                            <label class="form-check-label" for="isFreeBet">Esta é uma Free Bet?</label>
-                        </div>
-
-                        <!-- Free Bet Fields (Hidden initially) -->
-                        <div id="freeBetFields" class="border p-3 rounded" style="display: none;">
-                            <div class="mb-3">
-                                <label for="promoName" class="form-label">Nome da Promoção</label>
-                                <input type="text" class="form-control" id="promoName"
-                                    placeholder="Digite o nome da promoção">
-                            </div>
-                            <div class="row g-3">
-                                <div class="col">
-                                    <label for="freeBetExpiry" class="form-label">Data de Expiração</label>
-                                    <input type="date" class="form-control" id="freeBetExpiry">
-                                </div>
-                                <div class="col">
-                                    <label for="freeBetReturn" class="form-label">Retorno Esperado</label>
-                                    <input type="number" class="form-control" id="freeBetReturn" step="0.01">
-                                </div>
-                            </div>
-                        </div>
-                </form>
+        <div id="tabContent" class="p-4">
+            <div id="calculatorTab" class="tab-pane active">
+                <!-- Calculator content will be loaded here -->
             </div>
-
-            <!-- Result Display Section -->
-            <div class="col-md-12 mt-4">
-                <h3>Resultado</h3>
-                <div class="p-3 border rounded bg-light">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped text-center">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Casa de Apostas</th>
-                                    <th>Valor Aposta</th>
-                                    <th>Probabilidade</th>
-                                    <th>Retorno Bruto</th>
-                                    <th>Comissão</th>
-                                    <th>Retorno Líquido</th>
-                                </tr>
-                            </thead>
-                            <tbody id="resultContainer">
-
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="row mt-4" id="resultResume">
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal for Loading -->
-        <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true">
-
-            <div class="modal-dialog d-flex justify-content-center align-items-center">
-                <div class="modal-content text-center">
-                    <div class="modal-body">
-                        <output class="spinner-border text-primary">
-                            <span class="visually-hidden">Loading...</span>
-                        </output>
-                        <p>Enviando dados...</p>
-                    </div>
-                </div>
+            <div id="betsTab" class="tab-pane">
+                <!-- Bets content will be loaded here -->
             </div>
         </div>
     </div>
-    <!-- Modal de Login -->
-    <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="tooltip"
-                        title="Informações adicionais">
-                        <i class="fas fa-info-circle"></i> Info
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="loginForm">
-                        <div class="mb-3">
-                            <label for="email" class="label">Email</label>
-                            <input type="email" class="form-control" id="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="password" required>
-                        </div>
-                        <div class="mb-3 d-none" id="sheetIdContainer">
-                            <label for="sheetUrl" class="form-label">Google Sheet link</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="sheetUrl">
-                                <button class="btn btn-primary" id="importSheets">
-                                    <span id="importText">Importar</span>
-                                    <output class="spinner-border spinner-border-sm text-light d-none"
-                                        id="importSpinner">
-                                        <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3 d-none" id="sheetSelectorContainer">
-                        <label for="sheetSelector" class="form-label">Escolha a Planilha</label>
-                        <select class="form-control" id="sheetSelector">
-                            <option value="">Selecione...</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary " id="login">
-                        <span>Entrar</span>
 
-                        <output class="spinner-border spinner-border-sm text-light d-none spinner">
-                            <span class="visually-hidden">Loading...</span>
-                        </output>
-                    </button>
-                    <button class="btn btn-primary d-none" id="register">
-                        <output class="spinner-border spinner-border-sm text-light d-none spinner">
-                            <span class="visually-hidden">Loading...</span>
-                        </output>
-                        Cadastrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-
-    <!-- External JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"
-        integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="js/main.js"></script>
-    <script src="js/jquery/jquery-2.7.1.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Function to load content dynamically (only when tab is clicked)
+            function loadContent(tab) {
+                let tabContent = $(`#${tab}Tab`);
+
+                // Carrega o conteúdo apenas se ele ainda não foi carregado
+                if (!tabContent.data('loaded')) {
+                    tabContent.load(`js/${tab}/${tab}.html`, function () {
+                        tabContent.data('loaded', true);
+                    });
+                }
+            }
+
+            // Handle tab click event
+            $(".nav-link").click(function (e) {
+                e.preventDefault();
+                $(".nav-link").removeClass("active");
+                $(this).addClass("active");
+
+                // Hide all tab content
+                $(".tab-pane").hide();
+
+                // Get the clicked tab and show it
+                let tab = $(this).data("tab");
+                $(`#${tab}Tab`).show();
+
+                // Load content dynamically for the selected tab
+                loadContent(tab);
+            });
+
+            // Show the default tab content initially
+            $("#calculatorTab").show();
+            $(".nav-link[data-tab='calculator']").addClass("active");
+
+            // Load the content for the default tab (calculator) when the page loads
+            loadContent("calculator");
+        });
+
+    </script>
+
 </body>
 
 </html>

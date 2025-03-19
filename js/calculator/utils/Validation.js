@@ -4,7 +4,11 @@ export default class Validation {
     }
 
     static isValidOdd(odd) {
-        return typeof odd === 'number' && !isNaN(odd) && odd > 0;
+        return typeof parseFloat(odd) === 'number' && !isNaN(odd) && odd > 0;
+    }
+
+    static isValidCommision(commission) {
+        return typeof parseFloat(commission) === 'number' && !isNaN(commission);
     }
 
     static isValidStake(stake) {

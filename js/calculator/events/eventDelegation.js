@@ -38,7 +38,7 @@ export const setupEventListeners = (
             handleBettingHouseInput(BetManager, event)
         )
         .on('input', '.comissionInput', (event) =>
-            handleComissionInput(BetManager, event, uiUpdater)
+            handleComissionInput(BetManager, uiUpdater, event)
         )
         .on('click', '.delete-bet', (event) =>
             handleDeleteBet(BetManager, uiUpdater, event)
@@ -47,7 +47,7 @@ export const setupEventListeners = (
             handleFixedStakeChange(uiUpdater, event)
         )
         .on('change', '.lay-bet-switch', (event) =>
-            handleLayBet(BetManager, event, uiUpdater)
+            handleLayBet(BetManager, uiUpdater, event)
         )
         .on('change', '#comissionCheckbox', (event) =>
             handleComissionCheckBox(event)

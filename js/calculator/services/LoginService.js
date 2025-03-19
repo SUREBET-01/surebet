@@ -2,75 +2,34 @@ import ToastManager from '../utils/ToastManager.js';
 import {
     handleEmailInput,
     handlePasswordInput,
-    handleGoogleIdInput,
 } from '../events/eventHandlers.js';
-import Utils from '../utils/utils.js';
 export default class LoginService {
     checkLogin() {
         const userEmail = localStorage.getItem('userEmail');
         const userPassword = localStorage.getItem('userPassword');
-        const sheetId = localStorage.getItem('sheetId');
-        if (!userEmail || !userPassword || !sheetId) {
+        const userId = localStorage.getItem('userId');
+        if (!userEmail || !userPassword || !userId) {
             $('#loginModal').modal('show');
         } else {
             this.loginUsuario(userEmail, userPassword, true);
         }
     }
 
-    submitLogin() {
-        const email = $('#email').val().trim();
-        const password = $('#password').val().trim();
-        const sheetUrl = $('#sheetUrl').val().trim();
-        const sheetName = $('#sheetSelector').val();
-
-        if (!this.validateInputs(email, password, sheetUrl, sheetName)) return;
-        this.toggleSpinner(true);
-
-        const sheetId = Utils.getSheetId(sheetUrl);
-
-        $.ajax({
-            url: 'https://script.google.com/macros/s/AKfycbyhM5bbZeEhFsbH4kf6Bt_XV8zQ2xJJc31cJelkDfpBeJm7jwMLF-MjreQTHUQ30te2/exec',
-            type: 'POST',
-            contentType: 'text/plain',
-            data: JSON.stringify({
-                action: 'cadastro',
-                email: email,
-                password: password,
-                sheetId: sheetId,
-                sheetName: sheetName,
-            }),
-            success: (response) => {
-                this.toggleSpinner(false);
-                if (response.status === 'success') {
-                    ToastManager.showSuccess('Cadastrado com sucesso!');
-                    this.storeCredentials(email, password, sheetId, sheetName);
-                    $('#loginModal').modal('hide');
-                } else {
-                    ToastManager.showError(
-                        'Erro ao cadastrar usuário: ' + response.message
-                    );
-                }
-            },
-            error: (error) => {
-                this.toggleSpinner(false);
-                ToastManager.showError(
-                    'Erro ao enviar os dados: ' + error.responseText
-                );
-            },
-        });
-    }
-
     loginUsuario(userEmail, userPassword, isAutocheck = false) {
-        this.toggleSpinner(true);
-        const email = $('#email').val().trim() || userEmail;
-        const password = $('#password').val().trim() || userPassword;
-
+        const email = $('#email').val()|| userEmail;
+        const password = $('#password').val() || userPassword;
+        const userId = Date.now();
+        if (!isAutocheck) {
+            if (!this.validateInputsLogin(email, password)) return;
+            this.toggleSpinner(true);
+        }
         $.ajax({
             url: 'https://script.google.com/macros/s/AKfycbyhM5bbZeEhFsbH4kf6Bt_XV8zQ2xJJc31cJelkDfpBeJm7jwMLF-MjreQTHUQ30te2/exec',
             type: 'POST',
             contentType: 'text/plain',
             data: JSON.stringify({
                 action: 'login',
+                userId: userId,
                 email: email,
                 password: password,
             }),
@@ -87,12 +46,7 @@ export default class LoginService {
                 } else if (response.status === 'success') {
                     ToastManager.showSuccess('Login bem-sucedido!');
                     $('#loginModal').modal('hide');
-                    this.storeCredentials(
-                        email,
-                        password,
-                        response.sheetId,
-                        response.sheetName
-                    );
+                    this.storeCredentials(email, password, userId);
                 }
             },
             error: (error) => {
@@ -102,27 +56,20 @@ export default class LoginService {
         });
     }
 
-    validateInputs(email, password, sheetId, sheetName) {
-        return (
-            handleEmailInput(email) &&
-            handlePasswordInput(password) &&
-            handleGoogleIdInput(sheetId) &&
-            handleGoogleIdInput(sheetName)
-        );
+    validateInputsLogin(email, password) {
+        return handleEmailInput(email) && handlePasswordInput(password);
     }
 
-    storeCredentials(email, password, sheetId, sheetName) {
+    storeCredentials(email, password, userId) {
         localStorage.setItem('userEmail', email);
         localStorage.setItem('userPassword', password);
-        localStorage.setItem('sheetId', sheetId);
-        localStorage.setItem('sheetName', sheetName);
+        localStorage.setItem('userId', userId);
     }
 
     clearLocalStorage() {
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userPassword');
-        localStorage.removeItem('sheetId');
-        localStorage.removeItem('sheetName');
+        localStorage.removeItem('userId');
     }
     toggleSpinner(isLoading) {
         $('#loginText').toggleClass('d-none', isLoading);
