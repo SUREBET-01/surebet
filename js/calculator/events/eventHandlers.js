@@ -42,6 +42,8 @@ const handleInputBetChange = (betManager, uiUpdater, event, type) => {
     // Set bet properties dynamically
     if (type === 'commission') {
         bet[type] = parseFloat(newValue) / 100;
+    } else if (type === 'bettingHouse') {
+        bet[type] = newValue;
     } else {
         bet[type] = parseFloat(newValue) || 0;
     }

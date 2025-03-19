@@ -10,36 +10,37 @@
 <body>
     <div class="container mt-4">
         <h1 class="mb-4">Bets Page</h1>
-
-        <!-- Table -->
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>User ID</th>
-                    <th>Surebet ID</th>
-                    <th>Data</th>
-                    
-                    <th>Casa de Apostas</th>
-                    <th>ODD</th>
-                    <th>Valor Aposta</th>
-                    <th>Total Investido</th>
-                    <th>Retorno Líquido por Aposta</th>
-                    <th>Lucro Total</th>
-                    <th>Retorno Bruto</th>
-                    <th>ROI</th>
-                    <th>Probabilidade</th>
-                    <th>Comissão</th>
-                    <th>Free Bet?</th>
-                    <th>Data Expiração Free Bet</th>
-                    <th>Retorno Free Bet</th>
-                    <th>Número de CPFs/Contas Usados</th>
-                    <th>Vitoria</th>
-                </tr>
-            </thead>
-            <tbody id="betsTableBody">
-                <!-- Data will be inserted here dynamically -->
-            </tbody>
-        </table>
+    
+        <!-- Scrollable Table -->
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>User ID</th>
+                        <th>Surebet ID</th>
+                        <th>Data</th>
+                        <th>Casa de Apostas</th>
+                        <th>ODD</th>
+                        <th>Valor Aposta</th>
+                        <th>Total Investido</th>
+                        <th>Retorno Líquido por Aposta</th>
+                        <th>Lucro Total</th>
+                        <th>Retorno Bruto</th>
+                        <th>ROI</th>
+                        <th>Probabilidade</th>
+                        <th>Comissão</th>
+                        <th>Free Bet?</th>
+                        <th>Data Expiração Free Bet</th>
+                        <th>Retorno Free Bet</th>
+                        <th>Número de CPFs/Contas Usados</th>
+                        <th>Vitória</th>
+                    </tr>
+                </thead>
+                <tbody id="betsTableBody">
+                    <!-- Data will be inserted here dynamically -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script type="module" src="js/bets/main.js"></script>

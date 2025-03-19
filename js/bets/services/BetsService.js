@@ -28,14 +28,14 @@ export default class BetsService {
             return;
         }
         
-    const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
+        const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        });
 
         bets.forEach((bet) => {
             const row = `
@@ -45,13 +45,13 @@ export default class BetsService {
                     <td>${bet.data}</td>
                     <td>${bet.casaDeApostas}</td>
                     <td>${bet.odd}</td>
-                    <td>${bet.valorAposta}</td>
+                    <td>${bet.valorAposta.toFixed(2)}</td>
                     <td>${bet.totalInvestido}</td>
-                    <td>${bet.retornoLiquidoPorAposta}</td>
+                    <td>${bet.retornoLiquidoPorAposta.toFixed(2)}</td>
                     <td>${bet.lucroTotal}</td>
-                    <td>${bet.retornoBruto}</td>
+                    <td>${bet.retornoBruto.toFixed(2)}</td>
                     <td>${bet.roi}</td>
-                    <td>${bet.probabilidade}</td>
+                    <td>${bet.probabilidade.toFixed(2)}</td>
                     <td>${bet.comissao}</td>
                     <td>${bet.freeBet ? "Sim" : "Não"}</td>
                     <td>${bet.dataExpiracaoFreeBet || 'N/A'}</td>
