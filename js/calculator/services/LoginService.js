@@ -1,8 +1,10 @@
-import ToastManager from '../utils/ToastManager.js';
+import ToastManager from '../../utils/ToastManager.js';
 import {
     handleEmailInput,
     handlePasswordInput,
 } from '../events/eventHandlers.js';
+import { ApiHelper } from '../../utils/ApiHelper.js';
+
 export default class LoginService {
     checkLogin() {
         const userEmail = localStorage.getItem('userEmail');
@@ -15,50 +17,45 @@ export default class LoginService {
         }
     }
 
-    loginUsuario(userEmail, userPassword, isAutocheck = false) {
-        const email = $('#email').val() || userEmail;
-        const password = $('#password').val() || userPassword;
-        const userId = Date.now();
-        if (!isAutocheck) {
-            if (!this.validateInputsLogin(email, password)) return;
-            this.toggleSpinner(true);
-        }
-        $.ajax({
-            url: 'https://script.google.com/macros/s/AKfycbyhM5bbZeEhFsbH4kf6Bt_XV8zQ2xJJc31cJelkDfpBeJm7jwMLF-MjreQTHUQ30te2/exec',
-            type: 'POST',
-            contentType: 'text/plain',
-            data: JSON.stringify({
-                action: 'login',
-                userId: userId,
-                email: email,
-                password: password,
-            }),
-            success: (response) => {
-                this.toggleSpinner(false);
-                if (!response.findEmail || response.status === 'error') {
-                    if (this.wrongPassword(response.wrongPassword)) {
-                        $('#loginModal').modal('show');
-                        return;
-                    }
+    async loginUsuario(userEmail, userPassword, isAutocheck = false) {
+        try {
+            const email = $('#email').val() || userEmail;
+            const password = $('#password').val() || userPassword;
+            const userId = Date.now();
 
+            if (!isAutocheck) {
+                if (!this.validateInputsLogin(email, password)) return;
+                this.toggleSpinner(true);
+            }
+
+            const response = await ApiHelper.makeRequest('login', {
+                userId,
+                email,
+                password,
+            });
+            this.toggleSpinner(false);
+
+            if (!response.findEmail || response.status === 'error') {
+                if (this.wrongPassword(response.wrongPassword)) {
                     $('#loginModal').modal('show');
-                    this.clearLocalStorage();
-                } else if (response.status === 'success') {
-                    ToastManager.showSuccess('Login bem-sucedido!');
-                    $('#loginModal').modal('hide');
-                    this.storeCredentials(
-                        response.email,
-                        password,
-                        response.userId
-                    );
-                    console.log(response);
+                    return;
                 }
-            },
-            error: (error) => {
-                this.toggleSpinner(false);
-                ToastManager.showError('Erro ao fazer login: ' + error.message);
-            },
-        });
+                $('#loginModal').modal('show');
+                this.clearLocalStorage();
+            } else if (response.status === 'success') {
+                ToastManager.showSuccess('Login bem-sucedido!');
+                $('#loginModal').modal('hide');
+                this.storeCredentials(
+                    response.email,
+                    password,
+                    response.userId
+                );
+                console.log(response);
+            }
+        } catch (error) {
+            this.toggleSpinner(false);
+            ToastManager.showError('Erro ao fazer login: ' + error.message);
+        }
     }
 
     validateInputsLogin(email, password) {

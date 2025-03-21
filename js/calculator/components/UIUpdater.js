@@ -1,4 +1,4 @@
-import Validation from '../utils/Validation.js';
+import Validation from '../../utils/Validation.js';
 import CalculatorBackBet from '../calculations/backBets/CalculatorBackBet.js';
 import CalculatorLayBet from '../calculations/laybets/CalculatorLayBet.js';
 import BetResultGenerator from '../calculations/BetResultGenerator.js';

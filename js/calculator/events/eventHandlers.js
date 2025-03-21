@@ -1,5 +1,5 @@
-import Validation from '../utils/Validation.js';
-import ToastManager from '../utils/ToastManager.js';
+import Validation from '../../utils/Validation.js';
+import ToastManager from '../../utils/ToastManager.js';
 // Add Bet
 export const handleAddBet = (betManager, uiUpdater) => {
     const bet = betManager.addBet();
