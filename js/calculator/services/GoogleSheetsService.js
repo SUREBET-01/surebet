@@ -1,7 +1,6 @@
 import Validation from '../utils/Validation.js';
 import ToastManager from '../utils/ToastManager.js';
 import BetManager from '../models/BetManager.js';
-import Utils from '../utils/utils.js';
 import {
     handlePromoNameInput,
     handleFreeBetExpiryInput,
