@@ -19,6 +19,7 @@ export default class LoginService {
 
     async loginUsuario(userEmail, userPassword, isAutocheck = false) {
         try {
+            
             const email = $('#email').val() || userEmail;
             const password = $('#password').val() || userPassword;
             const userId = Date.now();
@@ -45,12 +46,13 @@ export default class LoginService {
             } else if (response.status === 'success') {
                 ToastManager.showSuccess('Login bem-sucedido!');
                 $('#loginModal').modal('hide');
+                $("#loading-overlay").addClass("hidden");
+
                 this.storeCredentials(
                     response.email,
                     password,
                     response.userId
                 );
-                console.log(response);
             }
         } catch (error) {
             this.toggleSpinner(false);

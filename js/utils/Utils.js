@@ -10,7 +10,18 @@ export class Utils {
             style: 'currency', 
             currency: 'BRL' 
         }).format(value);
+    }
+     
+    static formatDateToBRL(dateString) {
+        const date = new Date(dateString);
         
+        // Format date (DD/MM/YYYY)
+        const formattedDate = date.toLocaleDateString("pt-BR");
+        
+        // Format time (HH:mm)
+        const formattedTime = date.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+        
+        return `${formattedDate} ${formattedTime}`;
     }
     
 }

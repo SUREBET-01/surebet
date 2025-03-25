@@ -1,5 +1,6 @@
-import ToastManager from "../../utils/ToastManager.js";
+import ToastManager from '../../utils/ToastManager.js';
 import { ApiHelper } from '../../utils/ApiHelper.js';
+import { TableUtils } from '../../utils/TableUtils.js';
 
 export default class BetsService {
     async getAllBets() {
@@ -9,48 +10,59 @@ export default class BetsService {
                 userId,
             });
 
-            console.log(response);
-            this.populateTable(response.bets);
+            TableUtils.populateTable('betsTable', response.bets);
         } catch (error) {
             ToastManager.showError('Erro ao buscar apostas: ' + error.message);
         }
     }
 
-    populateTable(bets) {
-        const tableBody = $('#betsTableBody');
-        tableBody.empty(); // Clear previous data
-
-        if (bets.length === 0) {
-            tableBody.append(
-                '<tr><td colspan="14" class="text-center">Nenhuma aposta encontrada.</td></tr>'
-            );
+    async getSurebetByid(event) {
+        const surebetId = $(event.target).parent().data('surebetid');
+    
+        const response = await ApiHelper.makeRequest('getSureBetById', {
+            surebetId,
+        });
+    
+        if (response.status !== 'success') {
+            alert('Erro ao buscar dados da SureBet!');
             return;
         }
-
-        bets.forEach((bet) => {
-            const row = `
-                <tr>
-                    <td>${bet.userId}</td>
-                    <td>${bet.surebetId}</td>
-                    <td>${bet.data}</td>
-                    <td>${bet.casaDeApostas}</td>
-                    <td>${bet.odd}</td>
-                    <td>${bet.valorAposta.toFixed(2)}</td>
-                    <td>${bet.totalInvestido}</td>
-                    <td>${bet.retornoLiquidoPorAposta.toFixed(2)}</td>
-                    <td>${bet.lucroTotal}</td>
-                    <td>${bet.retornoBruto.toFixed(2)}</td>
-                    <td>${bet.roi}</td>
-                    <td>${bet.probabilidade.toFixed(2)}</td>
-                    <td>${bet.comissao}</td>
-                    <td>${bet.freeBet ? 'Sim' : 'Não'}</td>
-                    <td>${bet.dataExpiracaoFreeBet || 'N/A'}</td>
-                    <td>${bet.retornoFreeBet || 'N/A'}</td>
-                    <td>${bet.numeroCPFsContasUsados}</td>
-                    <td>${bet.vitoria ? 'Sim' : 'Não'}</td>
-                </tr>
+    
+        const bets = response.bets;
+        const cardsContainer = $('#surebetCards');
+        cardsContainer.empty();
+    
+        // Exibir Total Investido e ROI com cores dinâmicas
+        $('#total').html(`R$ ${bets[0].totalInvestido.toFixed(2)}`);
+        
+        let roi = bets[0].roi.toFixed(2);
+        let roiColor = roi >= 0 ? "text-success" : "text-danger";
+        $('#roiId').html(`<span class="${roiColor}">${roi}%</span>`);
+    
+        bets.forEach((bet, index) => {
+            const card = `
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">${bet.casaDeApostas}</h5>
+                            <p class="text-muted mb-1">Valor Apostado: <strong>R$ ${bet.valorAposta.toFixed(2)}</strong></p>
+                            <p class="text-muted mb-1">Retorno Bruto: <strong>R$ ${bet.retornoBruto.toFixed(2)}</strong></p>
+                            <p class="text-muted">Retorno Líquido: <strong class="${bet.retornoLiquidoPorAposta >= 0 ? 'text-success' : 'text-danger'}">R$ ${bet.retornoLiquidoPorAposta.toFixed(2)}</strong></p>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="winCheckbox${index}">
+                                <label class="form-check-label" for="winCheckbox${index}">Vitória</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
-            tableBody.append(row);
+            cardsContainer.append(card);
         });
+    
+        $('#surebetModal').modal('show');
+    }
+    
+    async updateSureBetWinner(){
+
     }
 }
