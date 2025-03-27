@@ -29,8 +29,6 @@ export class TableUtils {
             `;
             tableBody.append(row);
         });
-
-  
     }
 
     static groupBetsBySurebetId(bets) {
@@ -59,15 +57,54 @@ export class TableUtils {
 
     static formatCasas(casas) {
         return casas
-            .map((casa) => `<span class="badge ${casa}">${casa.toUpperCase()}</span>`)
+            .map(
+                (casa) =>
+                    `<span class="badge ${casa.toLowerCase()}">${casa}</span>`
+            )
             .join(' ');
     }
 
     static getVictoryIcon(vitoria) {
-        if (vitoria === 'Win')
-            return '✅ <span class="text-success">Ganhou</span>';
-        if (vitoria === 'Loss')
-            return '❌ <span class="text-danger">Perdeu</span>';
-        return '⏳ <span class="text-warning">Pendente</span>';
+        if (vitoria === 'Unresolved') {
+            return '⏳ <span class="text-warning">Pendente</span>';
+        } else {
+            return '✅ <span class="text-success">Resolvido</span>';
+        }
+    }
+
+    static loadingTable(tableBodyId) {
+        const tableBody = $(`#${tableBodyId}`);
+
+        // Show Skeleton Loader
+        tableBody.html(`
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
+        `);
+    }
+
+    static showSkeletonLoader(containerId, count = 2) {
+        const container = $(`#${containerId}`);
+        container.empty(); // Limpa o container antes de adicionar os loaders
+
+        for (let i = 0; i < count; i++) {
+            const skeletonCard = `
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="skeleton-box" style="width: 50%; height: 20px;"></h5>
+                            <p class="skeleton-box" style="width: 80%; height: 15px;"></p>
+                            <p class="skeleton-box" style="width: 60%; height: 15px;"></p>
+                            <p class="skeleton-box" style="width: 70%; height: 15px;"></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.append(skeletonCard);
+        }
     }
 }

@@ -22,7 +22,7 @@
                         <th class="text-nowrap">Vitória</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="betsTableBody">
                     <!-- Dynamic rows will be inserted here -->
                 </tbody>
             </table>
@@ -31,7 +31,7 @@
 
 
     <!-- SureBet Modal -->
-    <div id="surebetModal" class="modal fade" tabindex="-1">
+    <div id="surebetModal" class="modal fade" data-bs-backdrop="static" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content p-3">
                 <!-- Cards de Informações -->
@@ -62,7 +62,7 @@
                 <!-- Botões -->
                 <div class="modal-footer">
                     <button id="confirmWinnerBtn" class="btn btn-primary">Confirmar Vitória</button>
-                    <button class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button id="closeModelBets" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>
