@@ -1,4 +1,4 @@
-import SportbookService from './services/sportbookService.js';
+import SportbookService from '../services/SportbookService.js';
 
 const sportbookService = new SportbookService();
 

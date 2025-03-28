@@ -72,18 +72,18 @@ export class TableUtils {
         }
     }
 
-    static loadingTable(tableBodyId) {
+    static loadingTable(tableBodyId, colspan) {
         const tableBody = $(`#${tableBodyId}`);
 
         // Show Skeleton Loader
         tableBody.html(`
-        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
-        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
-        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
-        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
-        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
-        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
-        <tr class="skeleton-row"><td colspan="5"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="${colspan}"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="${colspan}"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="${colspan}"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="${colspan}"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="${colspan}"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="${colspan}"><div class="skeleton-box"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="${colspan}"><div class="skeleton-box"></div></td></tr>
         `);
     }
 

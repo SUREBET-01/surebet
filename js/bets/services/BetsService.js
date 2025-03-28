@@ -5,7 +5,7 @@ import { TableUtils } from '../../utils/TableUtils.js';
 export default class BetsService {
     async getAllBets() {
         try {
-            TableUtils.loadingTable('betsTableBody');
+            TableUtils.loadingTable('betsTableBody', '5');
             const userId = localStorage.getItem('userId');
             const response = await ApiHelper.makeRequest('getBetsByUserId', {
                 userId,
