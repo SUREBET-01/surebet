@@ -82,14 +82,19 @@ export class SportbookService {
 
     async getSportbookById(event) {
         const sportbookID = $(event.target).closest('.sportbookRow').data('sportbookid');
-
+        const containerId = 'editForm';
+        
+        const tableBody = $(`#${containerId}`);
+        tableBody.empty(); // Clear previous data
+        
+        TableUtils.showSkeletonLoader(containerId, 3);
+           
         $('#editModal').modal('show');
 
         try {
             const response = await ApiHelper.makeRequest('doGetSportbookById', {
                 sportbookID,
             });
-            const containerId = 'editForm';
             if (response.status !== 'success') {
                 alert('Erro ao buscar dados da SureBet!');
                 return;
@@ -98,9 +103,9 @@ export class SportbookService {
             const formContainer = $(`#${containerId}`);
             
             const sportbooks = response.sportbook;
-            const tableBody = $(`#${containerId}`);
+
             tableBody.empty(); // Clear previous data
-           
+
             sportbooks.forEach((sportbook, index) => {
                 let ultimaAtualizacao = Utils.formatDateToBRL(sportbook.ultimaAtualizacao);
                 const formInputs = `
@@ -138,7 +143,7 @@ export class SportbookService {
         }
     }
 
-    editSportbook(sportbooks) {
+    editSportbook(event) {
         const tableBody = $("#sportbookTableBody");
         tableBody.empty(); // Limpar dados anteriores
     
