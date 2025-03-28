@@ -1,4 +1,4 @@
-import SportbookService from "../services/SportbookService.js";
+import { SportbookService } from "../services/SportbookService.js";
 import {closeModel } from "../events/eventHandlers.js"
 const sportbookService = new SportbookService();
 export const setupEventListeners = () => {

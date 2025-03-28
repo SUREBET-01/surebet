@@ -1,4 +1,5 @@
 import { SportbookService } from './services/SportbookService.js';
+import { setupEventListeners } from './events/eventDelegation.js';
 
 const sportbookService = new SportbookService();
 
@@ -11,4 +12,5 @@ $('.nav-link').click(function (e) {
 
 $(document).ready(() => {
     sportbookService.getAllSportbook();
+    setupEventListeners();
 });
