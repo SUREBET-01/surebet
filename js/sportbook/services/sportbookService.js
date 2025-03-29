@@ -263,7 +263,6 @@ export class SportbookService {
         } finally {
             // Restaura o estado do botão após o processo ser concluído
             $('#saveNewSportbook').html('Salvar');
-            $('.modal-backdrop').remove();
         }
         
     }

@@ -67,7 +67,10 @@ export default class Utils {
         // Remove a modal após fechar
         $('#customAlert').on('hidden.bs.modal', function () {
             $(this).remove();
+            $('.modal-backdrop').remove();
         });
+        
+
     }
     
 }
