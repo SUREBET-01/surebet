@@ -5,11 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
     <div class="container mt-4">
-        <h1 class="mb-4">SportBook Page</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>SportBook Page</h1>
+            <!-- Botão "Novo" -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newSportbookModal">
+                Novo Sportbook
+            </button>
+        </div>
     
         <!-- Scrollable Table -->
         <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
@@ -32,7 +40,40 @@
         </div>
     </div>
 
-    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"aria-labelledby="editModalLabel" aria-hidden="true">
+    <!-- Modal para Adicionar Novo Sportbook -->
+    <div class="modal fade" id="newSportbookModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="newSportbookModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newSportbookModalLabel">Novo Sportbook</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newSportbookForm">
+                        <div class="mb-3">
+                            <label for="nomeDaCasa" class="form-label">Nome da Casa</label>
+                            <input type="text" class="form-control" id="nomeDaCasa" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="proprietario" class="form-label">Proprietário</label>
+                            <input type="text" class="form-control" id="proprietario" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="saldo" class="form-label">Saldo</label>
+                            <input type="number" class="form-control" id="saldo" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="saveNewSportbook">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição (Já existente) -->
+    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -52,8 +93,26 @@
         </div>
     </div>
 
+    <!-- Modal de Exclusão (Já existente) -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmationLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    Tem certeza de que deseja excluir este Sportbook?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteSportbook">Deletar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script type="module" src="js\sportbook\main.js"></script>
+    <script type="module" src="js/sportbook/main.js"></script>
 </body>
 
 </html>
