@@ -89,7 +89,7 @@ export class SportbookService {
             console.error(error);
         } finally {
             // Restaura o estado do botão após o processo ser concluído
-            $('#confirmDeleteSportbook').html('Salvar');
+            $('#confirmDeleteSportbook').html('Deletar');
             $('#confirmDeleteSportbook').prop('disabled', false);
         }
 
