@@ -72,5 +72,17 @@ export default class Utils {
         
 
     }
+    static toggleButtonLoading(button, isLoading, loadingText = 'Atualizando...', defaultText = 'Confirmar') {
+        if (isLoading) {
+            $(button).html(
+                `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${loadingText}`
+            );
+            $(button).prop('disabled', true);
+        } else {
+            $(button).html(defaultText);
+            $(button).prop('disabled', false);
+        }
+    }
+    
     
 }

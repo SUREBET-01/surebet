@@ -87,7 +87,7 @@ export class TableUtils {
         `);
     }
 
-    static showSkeletonLoader(containerId, count = 2) {
+    static showSkeletonCardLoader(containerId, count = 2) {
         const container = $(`#${containerId}`);
         container.empty(); // Limpa o container antes de adicionar os loaders
 

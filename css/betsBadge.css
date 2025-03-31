@@ -12,7 +12,7 @@
 
 .betano {
     background-color: rgba(255, 255, 255, 0.753); /* Branco translúcido */
-    color: #ff3c00; /* Laranja */
+    color: #ff3c00 !important; /* Laranja */
 }
 
 .betfair {

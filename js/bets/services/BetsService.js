@@ -1,6 +1,7 @@
 import ToastManager from '../../utils/ToastManager.js';
 import { ApiHelper } from '../../utils/ApiHelper.js';
 import { TableUtils } from '../../utils/TableUtils.js';
+import Ultils from '../../utils/Utils.js';
 
 export default class BetsService {
     async getAllBets() {
@@ -23,7 +24,7 @@ export default class BetsService {
             .data('surebetid');
         const containerId = 'surebetCards';
 
-        TableUtils.showSkeletonLoader(containerId, 3);
+        TableUtils.showSkeletonCardLoader(containerId, 3);
 
         $('#surebetModal').modal('show');
 
@@ -57,8 +58,8 @@ export default class BetsService {
                         <div class="card border-0 shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title badge fs-5 ${bet.casaDeApostas.toLowerCase()} sportbookid" data-sportbookid=${
-                                    bet.sportbookId
-                                }>${bet.casaDeApostas}</h5>
+                    bet.sportbookId
+                }>${bet.casaDeApostas}</h5>
                                 <p class="text-muted mb-1">Valor Apostado: <strong>R$ ${bet.valorAposta.toFixed(
                                     2
                                 )}</strong></p>
@@ -89,14 +90,10 @@ export default class BetsService {
     }
 
     async updateSureBetWinner() {
-
-        $('#confirmWinnerBtn').html(
-            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Atualizando...'
-        );
-        $('#confirmWinnerBtn').prop('disabled', true);
-
-        // Desabilitar o botão de fechar do modal
-        $('#closeModelBets').prop('disabled', true);
+        const confirmButton = '#confirmWinnerBtn';
+        const closeButton = '#closeModelBets';
+        Ultils.toggleButtonLoading(confirmButton, true, 'Atualizando...');
+        $(closeButton).prop('disabled', true);
 
         const betsData = [];
 
@@ -115,7 +112,6 @@ export default class BetsService {
         });
 
         try {
-            // Envia os dados para a API
             const response = await ApiHelper.makeRequest(
                 'updateSureBetWinner',
                 { bets: betsData }
@@ -131,17 +127,62 @@ export default class BetsService {
             console.error('Erro ao atualizar SureBet:', error);
             ToastManager.showError('Erro ao salvar os resultados.');
         } finally {
-            // Restaura o estado do botão após o processo ser concluído
-            $('#confirmWinnerBtn').html('Confirmar Vitória');
-            $('#confirmWinnerBtn').prop('disabled', false);
-            $('#closeModelBets').prop('disabled', false);
+            Ultils.toggleButtonLoading(
+                confirmButton,
+                false,
+                'Atualizando...',
+                'Confirmar Vitória'
+            );
+            $(closeButton).prop('disabled', false);
+
+            this.getSumarySportbook();
+            this.getAllBets();
         }
     }
+
     async getSumarySportbook() {
-
         const userId = localStorage.getItem('userId');
+        TableUtils.showSkeletonCardLoader("betCardsContainer", 4)
 
-        const response = await ApiHelper.makeRequest('sportbookbyuserid', {userId: userId});
-        console.log(response)
+        const response = await ApiHelper.makeRequest('sportbookbyuserid', {
+            userId: userId,
+        });
+        $('#betCardsContainer').empty();
+
+        response.sportbook.forEach((sportbook) => {
+            const saldoClass =
+                sportbook.saldo >= 0
+                    ? 'text-success fw-bold'
+                    : 'text-danger fw-bold';
+
+            const card = `
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="badge ${sportbook.nomedacasa.toLowerCase()}">
+                                    ${sportbook.nomedacasa}
+                                </span>
+                                <i class="bi bi-person-circle mx-2 text-muted"></i>
+                                <small class="text-muted">${sportbook.proprietario}</small>
+                            </div>
+                            <a href="${sportbook.url}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </h5>
+                        <p class="card-text">
+                            <i class="bi bi-clock-history"></i> Última atualização: 
+                            <strong>${Ultils.formatDateToBRL(sportbook.ultimaAtualizacao)}</strong>
+                        </p>
+                        <p class="card-text">
+                            Saldo: <span class="${saldoClass}">R$ ${sportbook.saldo}</span>
+                        </p>
+                    </div>
+                </div>
+
+            `;
+
+            $('#betCardsContainer').append(card);
+        });
     }
 }

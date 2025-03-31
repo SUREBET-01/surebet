@@ -5,6 +5,7 @@ $('.nav-link').click(function (e) {
     e.preventDefault();
     if ($(this).data('tab') === 'bets') {
         betsService.getAllBets();
+        betsService.getSumarySportbook();
     }
 });
 
