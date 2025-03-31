@@ -46,7 +46,7 @@ export default class UIUpdater {
                 <label for="bettingHouse${
                     bet.id
                 }" class="form-label">Betting House</label>
-                <select class="form-select" id="bettingHouse">
+                <select class="form-select" id="bettingHouse${bet.id}">
                 ${
                     this.betHouses.map(element => `<option value="${element.houseId}">${element.houseName}</option>`)
                     .join('')

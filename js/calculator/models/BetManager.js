@@ -8,7 +8,7 @@ export default class BetManager {
     }
 
     addBet(
-        bettingHouse = `Betting House ${this.bets.length + 1}`,
+        bettingHouse = `1`,
         odd = this.bets.length + 1,
         stake = 0.0
     ) {
@@ -42,7 +42,7 @@ export default class BetManager {
 
     updateBettingHouseNames() {
         this.bets.forEach((bet, index) => {
-            bet.bettingHouse = `Betting House ${index + 1}`;
+            bet.bettingHouse = `1`;
         });
     }
 
