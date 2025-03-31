@@ -41,3 +41,37 @@
 .skeleton-row td {
     padding: 10px;
 }
+
+#betCardsContainer {
+    display: flex;
+    flex-wrap: nowrap; /* Impede que os cards quebrem para a linha de baixo */
+    gap: 15px; /* Espaçamento entre os cards */
+    margin-bottom: 20px; /* Ajuste de margem entre cards e tabela */
+}
+
+.card {
+    min-width: 250px; /* Tamanho mínimo para os cards */
+    flex-shrink: 0; /* Impede o card de encolher */
+}
+
+/* Container com scroll */
+.bet-cards-container {
+    overflow-x: auto;
+    padding-bottom: 5px;
+    position: relative;
+}
+
+/* Barra de rolagem minimalista */
+.bet-cards-container::-webkit-scrollbar {
+    height: 7px;
+}
+
+.bet-cards-container::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+}
+
+.bet-cards-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
