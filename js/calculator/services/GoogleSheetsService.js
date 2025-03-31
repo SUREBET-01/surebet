@@ -17,7 +17,6 @@ export default class GoogleSheetsService {
 
     async saveToGoogleSheets() {
         try {
-            console.log(this.betManager)
             const totalStake = parseFloat($('#totalStake').val());
             const bets = this.betManager.bets.map((bet) => ({
                 bettingHouse: bet.bettingHouse,
