@@ -19,4 +19,5 @@ $(document).ready(() => {
     loginService.checkLogin();
     uiUpdater.initializeDefaultBets();
     setupEventListeners(betManager, uiUpdater, googleSheetsService, loginService);
+    googleSheetsService.getAllHouses();
 });

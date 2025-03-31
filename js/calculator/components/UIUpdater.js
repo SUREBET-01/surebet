@@ -3,6 +3,7 @@ import CalculatorBackBet from '../calculations/backBets/CalculatorBackBet.js';
 import CalculatorLayBet from '../calculations/laybets/CalculatorLayBet.js';
 import BetResultGenerator from '../calculations/BetResultGenerator.js';
 import SummaryGenerator from '../calculations/SummaryGenerator.js';
+import GoogleSheetsService from '../../calculator/services/GoogleSheetsService.js';
 
 export default class UIUpdater {
     constructor(betManager, calculatorLayBet = new CalculatorLayBet(), calculatorBackBet = new CalculatorBackBet()) {
@@ -11,9 +12,16 @@ export default class UIUpdater {
         this.userEditingStake = false;
         this.calculatorLayBet = calculatorLayBet;
         this.calculatorBackBet =  calculatorBackBet
+        this.betHouses = [];
+         
     }
 
-    initializeDefaultBets() {
+    async loadBetHouses() {
+        return await (new GoogleSheetsService(this.betManager)).getAllHouses();
+    }
+
+    async initializeDefaultBets() {
+        this.betHouses = await this.loadBetHouses();
         $('#totalStake').val(120);
         this.betManager.addBet();
         this.betManager.addBet();
@@ -22,6 +30,7 @@ export default class UIUpdater {
     }
 
     addBetRow(bet) {
+
         const deleteButton =
             bet.id > 2
                 ? `<div class="col-md-1"><button type="button" class="btn btn-danger delete-bet" data-id="${bet.id}" style="margin-top: 30px"><i class="fas fa-trash"></i></button></div>`
@@ -37,9 +46,12 @@ export default class UIUpdater {
                 <label for="bettingHouse${
                     bet.id
                 }" class="form-label">Betting House</label>
-                <input type="text" class="form-control" id="bettingHouse${
-                    bet.id
-                }" value="${bet.bettingHouse}">
+                <select class="form-select" id="bettingHouse">
+                ${
+                    this.betHouses.map(element => `<option value="${element.houseId}">${element.houseName}</option>`)
+                    .join('')
+                }
+                </select>
             </div>
             <div class="col-md-2">
                 <label for="odd${bet.id}"  id="label-odd${
@@ -226,4 +238,5 @@ export default class UIUpdater {
             $(`#backerStake${bet.id}`).val(bet.backerStake.toFixed(2));
         }
     }
+
 }

@@ -5,7 +5,6 @@ import {
     handlePromoNameInput,
     handleFreeBetExpiryInput,
     handleFreeBetReturnInput,
-    handleCpfCountInput,
 } from '../events/eventHandlers.js';
 import { ApiHelper } from '../../utils/ApiHelper.js';
 
@@ -18,6 +17,7 @@ export default class GoogleSheetsService {
 
     async saveToGoogleSheets() {
         try {
+            console.log(this.betManager)
             const totalStake = parseFloat($('#totalStake').val());
             const bets = this.betManager.bets.map((bet) => ({
                 bettingHouse: bet.bettingHouse,
@@ -35,7 +35,6 @@ export default class GoogleSheetsService {
             const promoName = $('#promoName').val();
             const freeBetExpiry = $('#freeBetExpiry').val();
             const freeBetReturn = parseFloat($('#freeBetReturn').val());
-            const accoutsUsed = parseInt($('#cpfCount').val());
             const netProfit = parseFloat($('#avaregeProfit').text());
             const roi = parseFloat($('#roi').text());
             const surebetId = Date.now();
@@ -47,9 +46,6 @@ export default class GoogleSheetsService {
                 );
                 return;
             }
-            if (!this.validateFreeBetInputs() || !handleCpfCountInput()) return;
-
-            $('#loadingModal').modal('show');
 
             const response = await ApiHelper.makeRequest('salvarDados', {
                 userId,
@@ -62,7 +58,6 @@ export default class GoogleSheetsService {
                 promoName,
                 freeBetExpiry,
                 freeBetReturn,
-                accoutsUsed,
             });
 
             $('#loadingModal').modal('hide');
@@ -70,7 +65,7 @@ export default class GoogleSheetsService {
             if (response.status === 'success') {
                 ToastManager.showSuccess(
                     'Dados salvos com sucesso! Surebet ID: ' +
-                        response.surebetId
+                    response.surebetId
                 );
             } else {
                 ToastManager.showError(
@@ -80,6 +75,21 @@ export default class GoogleSheetsService {
         } catch (error) {
             $('#loadingModal').modal('hide');
             ToastManager.showError('Erro ao enviar os dados: ' + error.message);
+        }
+    }
+
+    async getAllHouses() {
+
+        try {
+            const userId = localStorage.getItem('userId');
+            const response = await ApiHelper.makeRequest('getAllHouses', {
+                userId,
+            });
+
+            return response.houses            
+
+        } catch (error) {
+            ToastManager.showError('Erro ao buscar casas: ' + error.message);
         }
     }
 
