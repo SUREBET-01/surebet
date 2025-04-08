@@ -1,16 +1,16 @@
 import Validation from '../../utils/Validation.js';
 import ToastManager from '../../utils/ToastManager.js';
 // Add Bet
-export const handleAddBet = (betManager, uiUpdater) => {
+export const handleAddBet = (betManager, betUIManager, uiUpdater) => {
     const bet = betManager.addBet();
-    uiUpdater.addBetRow(bet);
+    betUIManager.addBetRow(bet);
 
     const comissionContainer = $(`.comissionContainer`);
 
     if ($('#comissionCheckbox').prop('checked')) {
         comissionContainer.removeClass('d-none');
     }
-    uiUpdater.updateOddInputs();
+    betUIManager.updateOddInputs();
     uiUpdater.handleBetsCalculate();
 };
 
@@ -91,9 +91,9 @@ export const handleLayBet = (betManager, uiUpdater, event) => {
     const commissionChecked = $("#comissionCheckbox").prop('checked')
 
     $('.backerStakeContainer')
-        .toggleClass('offset-md-5', bet.isLayBet)
-        .toggleClass('offset-md-7', !bet.isLayBet)
-        .toggleClass('offset-md-7', commissionChecked);
+        .toggleClass('offset-md-1', bet.isLayBet)
+        .toggleClass('offset-md-2', !bet.isLayBet)
+        .toggleClass('offset-md-2', commissionChecked);
 
     uiUpdater.handleLayBetCalculation(betManager.bets);
 };
@@ -101,16 +101,17 @@ export const handleLayBet = (betManager, uiUpdater, event) => {
 export const handleComissionCheckBox = (event) => {
     handleCheckboxToggle(event, '.comissionContainer', 'd-none');
     $('.backerStakeContainer')
-        .toggleClass('offset-md-5', !$(event.target).prop('checked'))
-        .toggleClass('offset-md-7', $(event.target).prop('checked'));
+        .toggleClass('offset-md-1', !$(event.target).prop('checked'))
+        .toggleClass('offset-md-2', $(event.target).prop('checked'));
 };
 
 // Delete Bet
-export const handleDeleteBet = (betManager, uiUpdater, event) => {
+export const handleDeleteBet = (betManager, betUIManager, uiUpdater, event) => {
     const id = $(event.target).closest('.delete-bet').data('id');
     betManager.removeBet(id);
     $(`.bet-row[data-id="${id}"]`).remove();
-    uiUpdater.updateOddInputs();
+    $(`.prop-row[data-id="${id}"]`).remove();
+    betUIManager.updateOddInputs();
     uiUpdater.handleBetsCalculate();
 };
 

@@ -4,6 +4,7 @@ import UIUpdater from './components/UIUpdater.js';
 import GoogleSheetsService from './services/GoogleSheetsService.js';
 import { setupEventListeners } from './events/eventDelegation.js';
 import LoginService from './services/LoginService.js';
+import BetUIManager from './components/BetUIManager.js';
 
 const betManager = new BetManager();
 const validation = new Validation();
@@ -15,9 +16,13 @@ const googleSheetsService = new GoogleSheetsService(
     uiUpdater,
 );
 
-$(document).ready(() => {
+$(document).ready( async () => {
     loginService.checkLogin();
     uiUpdater.initializeDefaultBets();
-    setupEventListeners(betManager, uiUpdater, googleSheetsService, loginService);
-    googleSheetsService.getAllHouses();
+
+    const betHouses = await googleSheetsService.getHousesByUserId();
+    const betUIManager = new BetUIManager(betHouses, betManager, uiUpdater);
+
+    setupEventListeners(betManager, uiUpdater, googleSheetsService, loginService, betUIManager);
+    googleSheetsService.getHousesByUserId();
 });

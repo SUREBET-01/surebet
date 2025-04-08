@@ -8,27 +8,31 @@ import {
 } from '../events/eventHandlers.js';
 import { ApiHelper } from '../../utils/ApiHelper.js';
 
-
-
 export default class GoogleSheetsService {
     constructor(BetManager) {
         this.betManager = BetManager;
     }
 
     async saveToGoogleSheets() {
+        this.saveSpinner(true);
+
         try {
             const totalStake = parseFloat($('#totalStake').val());
-            const bets = this.betManager.bets.map((bet) => ({
-                bettingHouse: bet.bettingHouse,
-                odd: bet.odd,
-                stake: bet.stake,
-                grossProfit: bet.isLayBet
-                    ? BetManager.calculateLayGrossProfit(bet)
-                    : BetManager.calculateBackGrossProfit(bet),
-                probability: bet.probability,
-                commission: bet.commission,
-                profit: bet.profit,
-            }));
+            const { formattedBets, invalidFields } = this.buildAndValidateBets(
+                this.betManager.bets
+            );
+
+            if (!Validation.isValidTotalStake(totalStake)) {
+                invalidFields.push('Total stake is invalid.');
+            }
+
+            if (invalidFields.length > 0) {
+                ToastManager.showError(
+                    'Por favor, corrija os seguintes erros:\n' +
+                        invalidFields.join('\n')
+                );
+                return;
+            }
 
             const isFreeBet = $('#isFreeBet').is(':checked');
             const promoName = $('#promoName').val();
@@ -39,16 +43,9 @@ export default class GoogleSheetsService {
             const surebetId = Date.now();
             const userId = localStorage.getItem('userId');
 
-            if (!Validation.isValidTotalStake(totalStake)) {
-                ToastManager.showError(
-                    'Por favor, corrija os erros nos campos antes de salvar.'
-                );
-                return;
-            }
-
             const response = await ApiHelper.makeRequest('salvarDados', {
                 userId,
-                bets,
+                bets: formattedBets,
                 totalStake,
                 netProfit,
                 roi,
@@ -64,7 +61,7 @@ export default class GoogleSheetsService {
             if (response.status === 'success') {
                 ToastManager.showSuccess(
                     'Dados salvos com sucesso! Surebet ID: ' +
-                    response.surebetId
+                        response.surebetId
                 );
             } else {
                 ToastManager.showError(
@@ -74,19 +71,19 @@ export default class GoogleSheetsService {
         } catch (error) {
             $('#loadingModal').modal('hide');
             ToastManager.showError('Erro ao enviar os dados: ' + error.message);
+        } finally {
+            this.saveSpinner(false);
         }
     }
 
-    async getAllHouses() {
-
+    async getHousesByUserId() {
         try {
             const userId = localStorage.getItem('userId');
-            const response = await ApiHelper.makeRequest('getAllHouses', {
+            const response = await ApiHelper.makeRequest('getHousesByUserId', {
                 userId,
             });
 
-            return response.houses            
-
+            return response.houses;
         } catch (error) {
             ToastManager.showError('Erro ao buscar casas: ' + error.message);
         }
@@ -101,4 +98,63 @@ export default class GoogleSheetsService {
 
         return isPromoNameValid && isFreeBetExpiryValid && isFreeBetReturnValid;
     };
+
+    buildAndValidateBets(bets) {
+        const invalidFields = [];
+
+        const formattedBets = bets.map((bet) => {
+            const $select = $(`#bettingHouse${bet.id} option:selected`);
+            const houseText = $select.text().trim();
+            const sportbook = $(`#owner${bet.id} option:selected`).data('sportbook')
+
+            const bettingHouse = {
+                name: houseText,
+                sportbookId: sportbook,
+            };
+
+            let owners = $(`#owner${bet.id}`)
+                .siblings('button')
+                .attr('title');
+
+
+            if (houseText === 'Selecione') {
+                ToastManager.showError(
+                    `Betting house not selected for bet #${bet.id}`
+                );
+                return
+
+            }
+
+            if (owners == 'Selecione') {
+                ToastManager.showError(`Owner(s) not selected for bet #${bet.id}`);
+                return
+            }
+
+            return {
+                bettingHouse,
+                owners,
+                odd: bet.odd,
+                stake: bet.stake,
+                grossProfit: bet.isLayBet
+                    ? BetManager.calculateLayGrossProfit(bet)
+                    : BetManager.calculateBackGrossProfit(bet),
+                probability: bet.probability,
+                commission: bet.commission,
+                profit: bet.profit,
+            };
+        });
+
+        return { formattedBets, invalidFields };
+    }
+
+    saveSpinner(showspinner) {
+        const $saveBtn = $('#saveButton');
+        if (showspinner) {
+            $saveBtn.prop('disabled', true).html(`
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Salvando...`);
+        } else {
+            $saveBtn.prop('disabled', false).html('Salvar');
+        }
+    }
 }

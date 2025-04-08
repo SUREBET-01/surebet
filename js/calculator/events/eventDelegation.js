@@ -16,9 +16,12 @@ export const setupEventListeners = (
     BetManager,
     uiUpdater,
     googleSheetsService,
-    loginService
+    loginService,
+    betUIManager
 ) => {
-    $('#addBetButton').click(() => handleAddBet(BetManager, uiUpdater));
+    $('#addBetButton').click(() =>
+        handleAddBet(BetManager, betUIManager, uiUpdater)
+    );
     $('#roundStakesCheckbox').change(() => uiUpdater.handleBetsCalculate());
     $('#isFreeBet').change(() => uiUpdater.toggleFreeBetFields());
     $('#saveButton').click(() => googleSheetsService.saveToGoogleSheets());
@@ -41,7 +44,7 @@ export const setupEventListeners = (
             handleComissionInput(BetManager, uiUpdater, event)
         )
         .on('click', '.delete-bet', (event) =>
-            handleDeleteBet(BetManager, uiUpdater, event)
+            handleDeleteBet(BetManager, betUIManager, uiUpdater, event)
         )
         .on('change', '.fixed-stake-radio', (event) =>
             handleFixedStakeChange(uiUpdater, event)
@@ -51,6 +54,12 @@ export const setupEventListeners = (
         )
         .on('change', '#comissionCheckbox', (event) =>
             handleComissionCheckBox(event)
+        )
+        .on('change', '.bettingHouse', (event) =>
+            betUIManager.updateOwnerOptions(event)
+        )
+        .on('change', '.owner-select', (event) =>
+            betUIManager.handleOwnerChange(event)
         )
         .on('input', '#totalStake', () => handleTotalStakeinput(uiUpdater));
 };

@@ -8,14 +8,13 @@ export default class BetManager {
     }
 
     addBet(
-        bettingHouse = `1`,
+        bettingHouse = '',
         odd = this.bets.length + 1,
         stake = 0.0
     ) {
         const bet = new Bet(++this.betCount, bettingHouse, odd, stake);
         this.bets.push(bet);
 
-        this.updateBettingHouseNames();
         this.updateOdds();
 
         return bet;
@@ -23,7 +22,6 @@ export default class BetManager {
 
     removeBet(id) {
         this.bets = this.bets.filter((bet) => bet.id !== id);
-        this.updateBettingHouseNames();
         this.updateOdds();
     }
 
@@ -38,12 +36,6 @@ export default class BetManager {
             fixedBetId,
             roundStakes
         );
-    }
-
-    updateBettingHouseNames() {
-        this.bets.forEach((bet, index) => {
-            bet.bettingHouse = `1`;
-        });
     }
 
     updateOdds() {

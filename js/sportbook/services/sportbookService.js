@@ -102,7 +102,7 @@ export class SportbookService {
         const tableBody = $(`#${containerId}`);
         tableBody.empty(); // Clear previous data
         
-        TableUtils.showSkeletonLoader(containerId, 3);
+        TableUtils.loadingTable(containerId, 3);
            
         $('#editModal').modal('show');
 

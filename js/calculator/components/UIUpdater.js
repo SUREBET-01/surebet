@@ -1,3 +1,4 @@
+import BetUIManager from './BetUIManager.js';
 import Validation from '../../utils/Validation.js';
 import CalculatorBackBet from '../calculations/backBets/CalculatorBackBet.js';
 import CalculatorLayBet from '../calculations/laybets/CalculatorLayBet.js';
@@ -6,106 +7,39 @@ import SummaryGenerator from '../calculations/SummaryGenerator.js';
 import GoogleSheetsService from '../../calculator/services/GoogleSheetsService.js';
 
 export default class UIUpdater {
-    constructor(betManager, calculatorLayBet = new CalculatorLayBet(), calculatorBackBet = new CalculatorBackBet()) {
+    constructor(
+        betManager,
+        calculatorLayBet = new CalculatorLayBet(),
+        calculatorBackBet = new CalculatorBackBet()
+    ) {
         this.betManager = betManager;
         this.userEditingTotalStake = false;
         this.userEditingStake = false;
         this.calculatorLayBet = calculatorLayBet;
-        this.calculatorBackBet =  calculatorBackBet
+        this.calculatorBackBet = calculatorBackBet;
         this.betHouses = [];
-         
+        this.betUIManager = null; // Inicializa como null
     }
 
     async loadBetHouses() {
-        return await (new GoogleSheetsService(this.betManager)).getAllHouses();
+        return await new GoogleSheetsService(
+            this.betManager
+        ).getHousesByUserId();
     }
 
     async initializeDefaultBets() {
         this.betHouses = await this.loadBetHouses();
+        this.betUIManager = new BetUIManager(this.betHouses, this.betManager); // Inicializa o BetUIManager
         $('#totalStake').val(120);
         this.betManager.addBet();
         this.betManager.addBet();
-        this.betManager.bets.forEach((bet) => this.addBetRow(bet));
+        this.betManager.bets.forEach((bet) => this.betUIManager.addBetRow(bet));
         this.handleBetsCalculate();
     }
 
-    addBetRow(bet) {
-
-        const deleteButton =
-            bet.id > 2
-                ? `<div class="col-md-1"><button type="button" class="btn btn-danger delete-bet" data-id="${bet.id}" style="margin-top: 30px"><i class="fas fa-trash"></i></button></div>`
-                : '';
-        const betRow = `
-        <div class="row g-3 bet-row mb-3  border-top mt-0" data-id="${bet.id}">
-            <div class="col-md-1 d-flex align-items-center">
-                <input type="radio" class="form-check-input fixed-stake-radio" name="fixedStake" data-id="${
-                    bet.id
-                }">
-            </div>
-            <div class="col-md-2">
-                <label for="bettingHouse${
-                    bet.id
-                }" class="form-label">Betting House</label>
-                <select class="form-select" id="bettingHouse${bet.id}">
-                ${
-                    this.betHouses.map(element => `<option value="${element.houseId}">${element.houseName}</option>`)
-                    .join('')
-                }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="odd${bet.id}"  id="label-odd${
-            bet.id
-        }" class="form-label">Odds</label>
-                <input type="number" class="form-control auto-calc" id="odd${
-                    bet.id
-                }" value="${bet.odd.toFixed(2)}" step="0.01">
-            </div>
-            <div class="col-md-2 d-none comissionContainer">
-                <label for="commission${bet.commission}"  id="label-commission${
-            bet.commission
-        }" class="form-label">Comissão</label>
-                <input type="number" class="form-control comissionInput" id="commission${
-                    bet.commission
-                }" value="${bet.commission.toFixed(2)}" step="0.01">
-            </div>
-            <div class="col-md-2">
-                <label for="stake${bet.id}" id="label-stake${
-            bet.id
-        }" class="form-label ">Stake</label>
-                <input type="number" class="form-control auto-calc stake-input" id="stake${
-                    bet.id
-                }" value="${bet.stake}" step="0.01">
-            </div>
-            <div class="col-md-2">
-                <div class="form-check form-switch" style="margin-top: 38px" >
-                    <input class="form-check-input lay-bet-switch" type="checkbox" role="switch" data-id="${
-                        bet.id
-                    }">
-                    <label class="form-check-label" for="stake${
-                        bet.id
-                    }">Lay bet?</label>
-                </div>
-            </div>    
-            ${deleteButton}
-             <div class="col-md-2 backerStakeContainer  d-none" id="backerStakeContainer${
-                 bet.id
-             }">
-                 <label for="backerStake${
-                     bet.id
-                 }" class="form-label">Backer's Stake</label>
-                 <input type="number" class="form-control backerStake-input" id="backerStake${
-                     bet.id
-                 }" value="">
-             </div>
-        </div>`;
-        $('#betContainer').append(betRow);
-    }
-
     handleBetsCalculate() {
-        // se tiver apemas uma lay bet precisa calcular tudo como lay/back
+        // se tiver apenas uma lay bet precisa calcular tudo como lay/back
         const layBets = this.betManager.bets.filter((bet) => bet.isLayBet);
-
         if (layBets.length > 0) {
             this.handleLayBetCalculation();
         } else {
@@ -113,6 +47,7 @@ export default class UIUpdater {
         }
     }
 
+    // Função para cálculos das apostas do tipo "Back"
     handleBackBetCalculation() {
         const {
             fixedBetId,
@@ -147,6 +82,7 @@ export default class UIUpdater {
         this.endcalucalate(results);
     }
 
+    // Função para cálculos das apostas do tipo "Lay"
     handleLayBetCalculation() {
         const bets = this.betManager.bets;
 
@@ -179,6 +115,7 @@ export default class UIUpdater {
         this.endcalucalate(results);
     }
 
+    // Função para calcular o total da stake
     calculateTotalStake() {
         if (this.userEditingTotalStake) return;
         let total = 0;
@@ -191,6 +128,7 @@ export default class UIUpdater {
         return total;
     }
 
+    // Função para atualizar os campos de aposta quando o usuário edita manualmente a stake
     handleStakeInputFocus(event) {
         let betId = $(event.target).closest('.bet-row').data('id');
         this.betManager.bets.forEach((bet) => {
@@ -200,17 +138,7 @@ export default class UIUpdater {
         });
     }
 
-    toggleFreeBetFields() {
-        const isFreeBet = $('#isFreeBet').is(':checked');
-        $('#freeBetFields').toggle(isFreeBet);
-    }
-
-    updateOddInputs() {
-        this.betManager.bets.forEach((bet) => {
-            $(`#odd${bet.id}`).val(bet.odd);
-        });
-    }
-
+    // Função para obter os valores fixos para os cálculos
     fixedValue() {
         const fixedBetId = $('.fixed-stake-radio:checked').data('id') || null;
         const isTotalInvestmentBase = $('#radioTotalInvestment').is(':checked');
@@ -224,6 +152,7 @@ export default class UIUpdater {
         };
     }
 
+    // Função para finalizar os cálculos e gerar os resultados e o resumo
     endcalucalate(results) {
         BetResultGenerator.generateBetResults(results);
         SummaryGenerator.generateSummary(results);
@@ -231,6 +160,7 @@ export default class UIUpdater {
         this.betManager.resetAllEditStatus();
     }
 
+    // Função para atualizar os campos de aposta editados manualmente
     updateManuallyEditedField(bet) {
         if (bet.editedField === "Backer's Stake") {
             $(`#stake${bet.id}`).val(bet.liability.toFixed(2));
