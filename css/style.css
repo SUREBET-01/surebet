@@ -75,3 +75,15 @@
     background: transparent;
 }
 
+
+.bootstrap-select .dropdown-toggle {
+    background-color: #fff !important; 
+    border: 1px solid #ced4da !important; 
+}
+
+.muilt {
+    height: auto !important;  
+    min-height: 38px;        
+    padding-bottom: 5px;      
+    overflow-y: visible !important;  
+}

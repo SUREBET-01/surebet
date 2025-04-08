@@ -2,7 +2,7 @@ export default class Validation {
     static isValidBettingHouse(bettingHouse) {
         return typeof bettingHouse === 'string' && bettingHouse.trim() !== '';
     }
-
+  
     static isValidOdd(odd) {
         return typeof parseFloat(odd) === 'number' && !isNaN(odd) && odd > 0;
     }
@@ -42,18 +42,15 @@ export default class Validation {
         return typeof parseFloat(cpfCount) === 'number' && !isNaN(cpfCount) && cpfCount > 0;
     }
 
-    // Email Validation
     static isValidEmail(email) {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailRegex.test(email);
     }
 
-    // Password Validation (at least 6 characters, including a number, a lowercase, and an uppercase letter)
     static isValidPassword(password) {
         return typeof password === 'string' && password.trim() !== '';
     }
 
-    // Google ID Validation (checks if the ID is a non-empty string)
     static isValidGoogleId(googleId) {
         return typeof googleId === 'string' && googleId.trim() !== '' && googleId !== undefined;
     }
