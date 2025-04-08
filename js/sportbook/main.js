@@ -1,5 +1,5 @@
-import { SportbookService } from './services/SportbookService.js';
 import { setupEventListeners } from './events/eventDelegation.js';
+import { SportbookService } from './services/sportbookService.js';
 
 const sportbookService = new SportbookService();
 

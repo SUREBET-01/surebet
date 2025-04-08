@@ -169,7 +169,8 @@ export class SportbookService {
             return;
         }
 
-        const sportbookData = {
+        const sportbookData = 
+        {
             userId: $("#UserID").val(),
             sportbookID: $("#sportbookID").val(),
             nomedacasa: nomedacasa,
