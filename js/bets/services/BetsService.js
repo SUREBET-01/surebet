@@ -142,7 +142,7 @@ export default class BetsService {
 
     async getSumarySportbook() {
         const userId = localStorage.getItem('userId');
-        TableUtils.showSkeletonCardLoader("betCardsContainer", 4)
+        TableUtils.showSkeletonCardLoader('betCardsContainer', 4);
 
         const response = await ApiHelper.makeRequest('sportbookbyuserid', {
             userId: userId,
@@ -164,18 +164,26 @@ export default class BetsService {
                                     ${sportbook.nomedacasa}
                                 </span>
                                 <i class="bi bi-person-circle mx-2 text-muted"></i>
-                                <small class="text-muted">${sportbook.proprietario}</small>
+                                <small class="text-muted">${
+                                    sportbook.proprietario
+                                }</small>
                             </div>
-                            <a href="${sportbook.url}" target="_blank" class="text-decoration-none">
+                            <a href="${
+                                sportbook.url
+                            }" target="_blank" class="text-decoration-none">
                                 <i class="bi bi-box-arrow-up-right"></i>
                             </a>
                         </h5>
                         <p class="card-text">
                             <i class="bi bi-clock-history"></i> Última atualização: 
-                            <strong>${Ultils.formatDateToBRL(sportbook.ultimaAtualizacao)}</strong>
+                            <strong>${Ultils.formatDateToBRL(
+                                sportbook.ultimaAtualizacao
+                            )}</strong>
                         </p>
                         <p class="card-text">
-                            Saldo: <span class="${saldoClass}">R$ ${sportbook.saldo}</span>
+                            Saldo: <span class="${saldoClass}">R$ ${sportbook.saldo.toFixed(
+                2
+            )}</span>
                         </p>
                     </div>
                 </div>

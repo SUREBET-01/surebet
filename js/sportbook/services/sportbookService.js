@@ -1,5 +1,5 @@
-import { ApiHelper } from "../../utils/ApiHelper.js";
-import Utils from "../../utils/Utils.js";
+import { ApiHelper } from '../../utils/ApiHelper.js';
+import Utils from '../../utils/Utils.js';
 import { TableUtils } from '../../utils/TableUtils.js';
 
 export class SportbookService {
@@ -7,32 +7,40 @@ export class SportbookService {
         TableUtils.loadingTable('sportbookTableBody', '7');
         const userId = localStorage.getItem('userId');
         const data = {
-            userId : userId
-        }
+            userId: userId,
+        };
         let sportbooks = await ApiHelper.makeRequest('sportbookbyuserid', data);
-        
+
         if (sportbooks.sportbook) {
-            this.populateTable(sportbooks.sportbook)
+            this.populateTable(sportbooks.sportbook);
         }
     }
 
     populateTable(sportbooks) {
-        const tableBody = $("#sportbookTableBody");
+        const tableBody = $('#sportbookTableBody');
         tableBody.empty(); // Limpar dados anteriores
 
         if (sportbooks.length === 0) {
-            tableBody.append('<tr><td colspan="7" class="text-center">Nenhuma aposta encontrada.</td></tr>');
+            tableBody.append(
+                '<tr><td colspan="7" class="text-center">Nenhuma aposta encontrada.</td></tr>'
+            );
             return;
         }
 
         sportbooks.forEach((sportbook) => {
             let saldo = Utils.formatToBRL(sportbook.saldo);
-            let ultimaAtualizacao = Utils.formatDateToBRL(sportbook.ultimaAtualizacao);
+            let ultimaAtualizacao = Utils.formatDateToBRL(
+                sportbook.ultimaAtualizacao
+            );
             const row = `
-                <tr class="sportbookRow" data-sportbookid="${sportbook.sportbookID}">
+                <tr class="sportbookRow" data-sportbookid="${
+                    sportbook.sportbookID
+                }">
                     <td>${sportbook.sportbookID}</td>
                     <td>${sportbook.userId}</td>
-                    <td><span class="badge ${sportbook.nomedacasa.toLowerCase()}">${sportbook.nomedacasa}</span></td>
+                    <td><span class="badge ${sportbook.nomedacasa.toLowerCase()}">${
+                sportbook.nomedacasa
+            }</span></td>
                     <td>${saldo}</td>
                     <td>${sportbook.proprietario}</td>
                     <td>${ultimaAtualizacao}</td>
@@ -51,10 +59,11 @@ export class SportbookService {
     }
 
     confirmDelete(event) {
-        const sportbookID = $(event.target).closest('.sportbookRow').data('sportbookid');
+        const sportbookID = $(event.target)
+            .closest('.sportbookRow')
+            .data('sportbookid');
         const containerId = 'deleteConfirmationModal';
         const tableBody = $(`#${containerId}`);
-        
 
         $('#confirmDeleteSportbook').val(sportbookID);
         $('#deleteConfirmationModal').modal('show');
@@ -62,7 +71,7 @@ export class SportbookService {
 
     async deleteSportbook(event) {
         const sportbookID = $('#confirmDeleteSportbook').val();
-        
+
         $('#confirmDeleteSportbook').html(
             '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Excluindo...'
         );
@@ -82,8 +91,6 @@ export class SportbookService {
                 alert('Erro ao Deletar!');
                 return;
             }
-
-           
         } catch (error) {
             Utils.showAlert('Erro ao Deletar!', 'error');
             console.error(error);
@@ -92,18 +99,19 @@ export class SportbookService {
             $('#confirmDeleteSportbook').html('Deletar');
             $('#confirmDeleteSportbook').prop('disabled', false);
         }
-
-    } 
+    }
 
     async getSportbookById(event) {
-        const sportbookID = $(event.target).closest('.sportbookRow').data('sportbookid');
+        const sportbookID = $(event.target)
+            .closest('.sportbookRow')
+            .data('sportbookid');
         const containerId = 'editForm';
-        
+
         const tableBody = $(`#${containerId}`);
         tableBody.empty(); // Clear previous data
-        
+
         TableUtils.loadingTable(containerId, 3);
-           
+
         $('#editModal').modal('show');
 
         try {
@@ -116,13 +124,15 @@ export class SportbookService {
             }
 
             const formContainer = $(`#${containerId}`);
-            
+
             const sportbooks = response.sportbook;
 
             tableBody.empty(); // Clear previous data
 
             sportbooks.forEach((sportbook, index) => {
-                let ultimaAtualizacao = Utils.formatDateToBRL(sportbook.ultimaAtualizacao);
+                let ultimaAtualizacao = Utils.formatDateToBRL(
+                    sportbook.ultimaAtualizacao
+                );
                 const formInputs = `
                     <div class="mb-3">
                         <label class="form-label">User ID</label>
@@ -149,40 +159,42 @@ export class SportbookService {
                         <input type="text" id='ultimaAtualizacao' class="form-control" value="${ultimaAtualizacao}" readonly disabled>
                     </div>
                 `;
-    
+
                 formContainer.append(formInputs);
             });
         } catch (error) {
             alert('Erro ao buscar os dados da Sportbook!');
             console.error(error);
-        } 
+        }
     }
 
     async editSportbook(event) {
+        let nomedacasa = $('#novonomedacasa').val();
+        let saldo = $('#novosaldo').val();
+        let proprietario = $('#novoproprietario').val();
 
-        let nomedacasa = $("#novonomedacasa").val();
-        let saldo = $("#novosaldo").val();
-        let proprietario = $("#novoproprietario").val();
-
-        if (nomedacasa.length == 0 || saldo.length == 0 || proprietario.length == 0) {
+        if (
+            nomedacasa.length == 0 ||
+            saldo.length == 0 ||
+            proprietario.length == 0
+        ) {
             Utils.showAlert('Preencha todos os campos', 'error');
             return;
         }
 
-        const sportbookData = 
-        {
-            userId: $("#UserID").val(),
-            sportbookID: $("#sportbookID").val(),
+        const sportbookData = {
+            userId: $('#UserID').val(),
+            sportbookID: $('#sportbookID').val(),
             nomedacasa: nomedacasa,
             saldo: saldo,
             proprietario: proprietario,
-            ultimaAtualizacao: $("#ultimaAtualizacao").val()
+            ultimaAtualizacao: $('#ultimaAtualizacao').val(),
         };
 
         $('#saveEditSportbook').html(
             '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Atualizando...'
         );
-        
+
         try {
             const response = await ApiHelper.makeRequest('updateSportbook', {
                 sportbookData,
@@ -200,8 +212,6 @@ export class SportbookService {
                 Utils.showAlert('Erro ao Editar!', 'error');
                 return;
             }
-
-           
         } catch (error) {
             $('#editModal').modal('hide');
             Utils.showAlert('Erro ao Editar!', 'error');
@@ -211,17 +221,20 @@ export class SportbookService {
             $('#saveEditSportbook').html('Salvar');
             $('#saveEditSportbook').prop('disabled', false);
         }
-        
     }
 
-    async newSportbook(event) {
+    async saveNewSportbook(event) {
         const userId = localStorage.getItem('userId');
 
         var nomeDaCasa = $('#nomeDaCasa').val();
         var proprietario = $('#proprietario').val();
         var saldo = $('#saldo').val();
 
-        if (nomeDaCasa.length == 0 || proprietario.length == 0 || saldo.length == 0) {
+        if (
+            nomeDaCasa.length == 0 ||
+            proprietario.length == 0 ||
+            saldo.length == 0
+        ) {
             Utils.showAlert('Preencha todos os campos', 'error');
             return;
         }
@@ -230,13 +243,13 @@ export class SportbookService {
             userId: userId,
             nomedacasa: nomeDaCasa,
             saldo: saldo,
-            proprietario: proprietario
+            proprietario: proprietario,
         };
 
         $('#saveNewSportbook').html(
             '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Criando...'
         );
-        
+
         try {
             const response = await ApiHelper.makeRequest('addSportbook', {
                 sportbookData,
@@ -248,15 +261,13 @@ export class SportbookService {
                 $('#newSportbookModal').modal('hide');
 
                 this.getAllSportbook();
-                
+
                 return;
             } else {
                 $('#newSportbookModal').modal('hide');
                 Utils.showAlert('Erro ao Adicionar!', 'error');
                 return;
             }
-
-           
         } catch (error) {
             $('#newSportbookModal').modal('hide');
             Utils.showAlert('Erro ao Adicionar!', 'error');
@@ -265,7 +276,39 @@ export class SportbookService {
             // Restaura o estado do botão após o processo ser concluído
             $('#saveNewSportbook').html('Salvar');
         }
-        
+    }
+
+    async newSportbook() {
+        // Mostrar o modal primeiro
+        $('#newSportbookModal').modal('show');
+    
+        // Fazer a requisição para obter as casas
+        const response = await ApiHelper.makeRequest('getAllHouses', 'get');
+    
+        // Gerar as opções
+        const houseOptions = this.generateOptions(response.houses);
+    
+        // Substituir o conteúdo do <select>
+        $('#selectBethouses').html(houseOptions);
+    
+        // Destruir o selectpicker antigo (opcional, mas recomendado)
+        $('#selectBethouses').selectpicker('destroy');
+    
+        // Re-inicializar o selectpicker
+        $('#selectBethouses').selectpicker('refresh');
+    }
+    
+
+    generateOptions(options) {
+        return `
+            <option value="" disabled selected>Selecione</option>
+            ${options
+                .map(
+                    (house) =>
+                        `<option value="${house.houseId}" data-content="<span class='badge ${house.houseName.toLowerCase()}'>${house.houseName}</span>">${house.houseName}</option>`
+                )
+                .join('')}
+        `;
     }
     
 }
