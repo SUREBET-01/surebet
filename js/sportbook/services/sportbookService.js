@@ -144,7 +144,7 @@ export class SportbookService {
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Nome da Casa</label>
-                        <input type="text" id='novonomedacasa' class="form-control" value="${sportbook.nomedacasa}">
+                        <input type="text" id='novonomedacasa' class="form-control" value="${sportbook.nomedacasa}" readonly disabled>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Saldo</label>
@@ -185,7 +185,7 @@ export class SportbookService {
         const sportbookData = {
             userId: $('#UserID').val(),
             sportbookID: $('#sportbookID').val(),
-            nomedacasa: nomedacasa,
+            nomedacasa: $('#novonomedacasa').val(),
             saldo: saldo,
             proprietario: proprietario,
             ultimaAtualizacao: $('#ultimaAtualizacao').val(),
@@ -226,10 +226,11 @@ export class SportbookService {
     async saveNewSportbook(event) {
         const userId = localStorage.getItem('userId');
 
-        var nomeDaCasa = $('#nomeDaCasa').val();
+        var nomeDaCasa = $('#selectBethouses option:selected').text();
+        var houseID = $('#selectBethouses').val();
         var proprietario = $('#proprietario').val();
         var saldo = $('#saldo').val();
-
+        
         if (
             nomeDaCasa.length == 0 ||
             proprietario.length == 0 ||
@@ -244,6 +245,7 @@ export class SportbookService {
             nomedacasa: nomeDaCasa,
             saldo: saldo,
             proprietario: proprietario,
+            houseid: houseID,
         };
 
         $('#saveNewSportbook').html(
@@ -301,7 +303,7 @@ export class SportbookService {
 
     generateOptions(options) {
         return `
-            <option value="" disabled selected>Selecione</option>
+            <option value="" disabled selected></option>
             ${options
                 .map(
                     (house) =>
